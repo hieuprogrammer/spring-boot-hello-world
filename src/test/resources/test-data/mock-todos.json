@@ -1,0 +1,43 @@
+[
+  {
+    "todo": "Complete Spring Boot project",
+    "description": "Finish implementing all features for the Spring Boot hello world application",
+    "status": "IN_PROGRESS"
+  },
+  {
+    "todo": "Review code changes",
+    "description": "Go through the pull request and provide feedback",
+    "status": "PENDING"
+  },
+  {
+    "todo": "Write unit tests",
+    "description": "Add comprehensive unit tests for all service methods",
+    "status": "PENDING"
+  },
+  {
+    "todo": "Update documentation",
+    "description": "Update README with new features and setup instructions",
+    "status": "PENDING"
+  },
+  {
+    "todo": "Deploy to production",
+    "description": "Deploy the application to production environment",
+    "status": "PENDING"
+  },
+  {
+    "todo": "Fix bug in authentication",
+    "description": "Resolve the authentication issue reported by QA team",
+    "status": "IN_PROGRESS"
+  },
+  {
+    "todo": "Attend team meeting",
+    "description": "Join the weekly team standup meeting",
+    "status": "COMPLETED"
+  },
+  {
+    "todo": "Refactor database queries",
+    "description": "Optimize slow database queries for better performance",
+    "status": "CANCELLED"
+  }
+]
+

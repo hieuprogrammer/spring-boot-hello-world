@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${DB_USERNAME:admin}:${DB_PASSWORD:admin}@${DB_HOST:localhost}:${DB_PORT:27017}/${DB_NAME:todo}?authSource=admin
+      database: ${DB_NAME:todo}
+      auto-index-creation: true
+

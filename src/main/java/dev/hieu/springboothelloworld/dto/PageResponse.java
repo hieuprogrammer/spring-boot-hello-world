@@ -1,7 +1,6 @@
 package dev.hieu.springboothelloworld.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.List;
 @Schema(description = "Paginated response wrapper")
 public class PageResponse<T> {
     
-    @ArraySchema(schema = @Schema(description = "List of items in the current page"))
+    @Schema(description = "List of items in the current page", type = "array")
     private List<T> content;
     
     @Schema(description = "Current page number (0-indexed)")

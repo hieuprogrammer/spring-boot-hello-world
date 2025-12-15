@@ -46,7 +46,10 @@ public class TodoApi {
             description = "Retrieve all todos with optional pagination and sorting. Supports query parameters: page (default 0), size (default 10), sort (e.g., 'todo,asc' or 'status,desc')"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved todos")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved todos"
+            )
     })
     @GetMapping
     public ResponseEntity<PageResponse<TodoDTO>> getAllTodos(
@@ -67,7 +70,10 @@ public class TodoApi {
             description = "Search todos by keyword and/or status with pagination and sorting. Supports query parameters: keyword, status, page (default 0), size (default 10), sort (e.g., 'todo,asc')"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved search results")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved search results"
+            )
     })
     @GetMapping("/search")
     public ResponseEntity<PageResponse<TodoDTO>> searchTodos(

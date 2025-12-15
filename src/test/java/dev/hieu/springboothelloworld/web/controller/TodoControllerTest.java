@@ -82,6 +82,57 @@ class TodoControllerTest {
     }
 
     @Test
+    void listTodos_WithPageSizeTooSmall_ShouldClampToMinimum() {
+        // Given
+        PageResponse<TodoDTO> clampedResponse = new PageResponse<>(
+                Arrays.asList(todoDTO1),
+                0, 1, 1, 1, true, true
+        );
+        when(todoService.getAllTodos(any(Pageable.class))).thenReturn(clampedResponse);
+
+        // When - size = 0 should be clamped to 1
+        String viewName = todoController.listTodos(0, 0, null, null, null, model);
+
+        // Then
+        assertEquals("todos/list", viewName);
+        verify(model, times(1)).addAttribute("pageSize", 1);
+    }
+
+    @Test
+    void listTodos_WithPageSizeTooLarge_ShouldClampToMaximum() {
+        // Given
+        PageResponse<TodoDTO> clampedResponse = new PageResponse<>(
+                Arrays.asList(todoDTO1, todoDTO2),
+                0, 100, 2, 1, true, true
+        );
+        when(todoService.getAllTodos(any(Pageable.class))).thenReturn(clampedResponse);
+
+        // When - size = 101 should be clamped to 100
+        String viewName = todoController.listTodos(0, 101, null, null, null, model);
+
+        // Then
+        assertEquals("todos/list", viewName);
+        verify(model, times(1)).addAttribute("pageSize", 100);
+    }
+
+    @Test
+    void listTodos_WithPageOutOfBounds_ShouldRedirectToLastPage() {
+        // Given
+        PageResponse<TodoDTO> emptyResponse = new PageResponse<>(
+                Arrays.asList(),
+                0, 10, 0, 1, true, true
+        );
+        when(todoService.getAllTodos(any(Pageable.class))).thenReturn(emptyResponse);
+
+        // When - page = 5 but totalPages = 1, should redirect to page 0
+        String result = todoController.listTodos(5, 10, null, null, null, model);
+
+        // Then - Should redirect
+        assertTrue(result.startsWith("redirect:"));
+        assertTrue(result.contains("page=0"));
+    }
+
+    @Test
     void listTodos_WithKeyword_ShouldUseSearch() {
         // Given
         String keyword = "Test";

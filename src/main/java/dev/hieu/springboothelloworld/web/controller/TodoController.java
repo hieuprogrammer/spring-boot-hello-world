@@ -34,6 +34,13 @@ public class TodoController {
             @RequestParam(required = false) Status status,
             Model model) {
         
+        // Validate and constrain page size
+        if (size < 1) {
+            size = 1;
+        } else if (size > 100) {
+            size = 100;
+        }
+        
         Pageable pageable = createPageable(page, size, sort);
         PageResponse<TodoDTO> pageResponse;
         
@@ -41,6 +48,16 @@ public class TodoController {
             pageResponse = todoService.searchTodos(keyword, status, pageable);
         } else {
             pageResponse = todoService.getAllTodos(pageable);
+        }
+        
+        // Adjust page if it's out of bounds after size change
+        if (page >= pageResponse.getTotalPages() && pageResponse.getTotalPages() > 0) {
+            page = pageResponse.getTotalPages() - 1;
+            // Redirect to corrected page
+            return "redirect:/todos?page=" + page + "&size=" + size + 
+                   (sort != null ? "&sort=" + sort : "") +
+                   (keyword != null ? "&keyword=" + keyword : "") +
+                   (status != null ? "&status=" + status : "");
         }
         
         model.addAttribute("todos", pageResponse.getContent());

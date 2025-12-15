@@ -1,7 +1,7 @@
 package dev.hieu.springboothelloworld.web.api;
 
-import dev.hieu.springboothelloworld.configuration.FeatureFlag;
-import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

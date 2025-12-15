@@ -1,7 +1,7 @@
 package dev.hieu.springboothelloworld.web;
 
-import dev.hieu.springboothelloworld.configuration.FeatureFlag;
-import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,5 +25,3 @@ public class GlobalModelAttributes {
         return featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API);
     }
 }
-
-

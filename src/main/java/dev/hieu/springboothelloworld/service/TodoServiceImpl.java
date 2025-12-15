@@ -71,6 +71,8 @@ public class TodoServiceImpl implements TodoService {
         todo.setTodo(todoCreateDTO.getTodo());
         todo.setDescription(todoCreateDTO.getDescription());
         todo.setStatus(todoCreateDTO.getStatus() != null ? todoCreateDTO.getStatus() : Status.PENDING);
+        todo.setDueAt(todoCreateDTO.getDueAt());
+        // createdAt and lastUpdatedAt are automatically set by @PrePersist
         
         Todo savedTodo = todoRepository.save(todo);
         return toDTO(savedTodo);
@@ -90,6 +92,10 @@ public class TodoServiceImpl implements TodoService {
         if (todoUpdateDTO.getStatus() != null) {
             todo.setStatus(todoUpdateDTO.getStatus());
         }
+        if (todoUpdateDTO.getDueAt() != null) {
+            todo.setDueAt(todoUpdateDTO.getDueAt());
+        }
+        // lastUpdatedAt is automatically updated by @PreUpdate
         
         Todo updatedTodo = todoRepository.save(todo);
         return toDTO(updatedTodo);
@@ -108,7 +114,10 @@ public class TodoServiceImpl implements TodoService {
                 todo.getId(),
                 todo.getTodo(),
                 todo.getDescription(),
-                todo.getStatus()
+                todo.getStatus(),
+                todo.getCreatedAt(),
+                todo.getLastUpdatedAt(),
+                todo.getDueAt()
         );
     }
     

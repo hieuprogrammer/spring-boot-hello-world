@@ -1,11 +1,14 @@
 package dev.hieu.springboothelloworld.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import dev.hieu.springboothelloworld.domain.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -22,5 +25,9 @@ public class TodoCreateDTO {
     
     @Schema(description = "Status of the todo", example = "PENDING", defaultValue = "PENDING")
     private Status status = Status.PENDING;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Schema(description = "Due date and time for the todo", example = "2024-12-20T17:00:00")
+    private LocalDateTime dueAt;
 }
 

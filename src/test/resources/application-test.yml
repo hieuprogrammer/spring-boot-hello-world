@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: hello-world-test
+
+# For tests we want deterministic, in-memory state: no persistence to JSON
+feature-flags:
+  persistence:
+    enabled: false
+  ping-api:
+    enabled: true
+  readme-logger:
+    enabled: false
+  todo-write-api:
+    enabled: true
+  todo-search-api:
+    enabled: true
+
+

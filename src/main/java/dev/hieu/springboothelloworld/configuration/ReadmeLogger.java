@@ -1,7 +1,11 @@
 package dev.hieu.springboothelloworld.configuration;
 
+import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +15,29 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Logs README.md content to the console on application startup.
+ * <p>
+ * This component is only created if {@code feature-flags.readme-logger.enabled=true} in application.yml.
+ * When disabled, the bean won't be picked up by ApplicationContext at all.
+ */
 @Component
+@ConditionalOnProperty(name = "feature-flags.readme-logger.enabled", havingValue = "true", matchIfMissing = false)
 @Slf4j
 @Order(1) // Run before DataInitializer
+@RequiredArgsConstructor
 public class ReadmeLogger implements CommandLineRunner {
 
+    private final FeatureFlagService featureFlagService;
+
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        // Guarded by feature flag – disabled by default
+        if (!featureFlagService.isEnabled(FeatureFlag.README_LOGGER)) {
+            log.debug("README logger feature flag is disabled. Skipping README logging.");
+            return;
+        }
+
         try {
             // Try to find README.md in the project root
             // First, try relative to current working directory

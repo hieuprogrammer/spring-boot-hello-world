@@ -1,4 +1,4 @@
-package dev.hieu.springboothelloworld.configuration;
+package dev.hieu.springboothelloworld.service.feature;
 
 /**
  * Enumerates all feature flags used in the application.
@@ -12,6 +12,11 @@ public enum FeatureFlag {
     PING_API,
 
     /**
+     * Controls logging the README.md content on startup.
+     */
+    README_LOGGER,
+
+    /**
      * Controls write operations on todos (create, update, delete).
      */
     TODO_WRITE_API,
@@ -21,5 +26,3 @@ public enum FeatureFlag {
      */
     TODO_SEARCH_API
 }
-
-

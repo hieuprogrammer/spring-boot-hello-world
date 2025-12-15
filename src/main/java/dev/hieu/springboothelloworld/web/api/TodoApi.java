@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.hieu.springboothelloworld.configuration.FeatureFlag;
-import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
 import dev.hieu.springboothelloworld.domain.Status;
 import dev.hieu.springboothelloworld.dto.PageResponse;
 import dev.hieu.springboothelloworld.dto.TodoCreateDTO;

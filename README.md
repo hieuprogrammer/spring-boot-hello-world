@@ -433,6 +433,8 @@ The application includes runtime-configurable feature flags to turn APIs and UI 
 
 #### Available Flags
 
+- `PING_API` – controls the `/ping` health-check endpoint.
+- `README_LOGGER` – controls logging the contents of `README.md` to the application logs on startup (**disabled by default**).
 - `TODO_WRITE_API` – controls create, update, and delete operations for todos (both REST API and Thymeleaf UI actions).
 - `TODO_SEARCH_API` – controls the `/api/todos/search` endpoint and search/filter functionality in the todo list view.
 
@@ -452,6 +454,9 @@ The application includes runtime-configurable feature flags to turn APIs and UI 
 
   # Enable search API
   curl -X PUT "$BASE_URL/api/features/TODO_SEARCH_API?enabled=true"
+
+   # Enable README logger (prints README.md to logs on startup)
+   curl -X PUT "$BASE_URL/api/features/README_LOGGER?enabled=true"
   ```
 
 #### Feature Flag UI

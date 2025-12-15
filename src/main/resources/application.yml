@@ -52,3 +52,16 @@ management:
   info:
     env:
       enabled: true
+
+# Feature flags configuration
+# These control initial state of feature flags at startup.
+# Runtime toggling via /api/features still works, but these values act as defaults on boot.
+feature-flags:
+  ping-api:
+    enabled: true   # Controls /ping endpoint
+  readme-logger:
+    enabled: false  # Disabled by default - ReadmeLogger bean won't be created if false
+  todo-write-api:
+    enabled: true   # Controls create/update/delete for todos (API + UI)
+  todo-search-api:
+    enabled: true   # Controls search API + UI

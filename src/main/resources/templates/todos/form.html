@@ -99,7 +99,8 @@
                 </div>
 
                 <!-- Form -->
-                <form th:action="${isEdit ? '/todos/' + todo.id : '/todos'}"
+                <form th:with="actionUrl=${isEdit ? '/todos/' + ${todo.id.toString()} : '/todos'}"
+                      th:action="${actionUrl}"
                       method="post"
                       class="space-y-6">
 
@@ -144,6 +145,18 @@
                                     th:selected="${todo?.status == s}"></option>
                         </select>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Current status of the todo</p>
+                    </div>
+
+                    <div>
+                        <label for="dueAt" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Due Date
+                        </label>
+                        <input type="datetime-local"
+                               id="dueAt"
+                               name="dueAt"
+                               th:value="${todo?.dueAt != null ? #temporals.format(todo.dueAt, 'yyyy-MM-dd\'T\'HH:mm') : ''}"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Optional due date and time for the todo</p>
                     </div>
 
                     <!-- Status Badge Preview -->

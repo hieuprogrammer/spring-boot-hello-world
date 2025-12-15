@@ -327,48 +327,404 @@ http://localhost:8080/swagger-ui.html
 |--------|----------|-------------|
 | GET | `/ping` | Health check endpoint |
 
-### Example API Requests
+### cURL Commands for All APIs
 
-#### Get All Todos (Paginated)
+All API endpoints can be tested using cURL commands. Replace `{id}` with an actual UUID when needed.
 
+#### 1. Ping Endpoint
+
+**Health Check**
+```bash
+curl -X GET "http://localhost:8080/ping"
+```
+
+**Expected Response:**
+```
+pong
+```
+
+---
+
+#### 2. Get All Todos
+
+**Basic Request (Default Pagination)**
+```bash
+curl -X GET "http://localhost:8080/api/todos"
+```
+
+**With Pagination**
+```bash
+curl -X GET "http://localhost:8080/api/todos?page=0&size=10"
+```
+
+**With Sorting (Ascending)**
 ```bash
 curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=todo,asc"
 ```
 
-#### Search Todos
+**With Sorting (Descending)**
+```bash
+curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=todo,desc"
+```
 
+**Sort by Status**
+```bash
+curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=status,asc"
+```
+
+**Sort by ID (Newest First)**
+```bash
+curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=id,desc"
+```
+
+**Pretty Print JSON Response**
+```bash
+curl -X GET "http://localhost:8080/api/todos?page=0&size=10" | json_pp
+```
+
+---
+
+#### 3. Search Todos
+
+**Search by Keyword Only**
+```bash
+curl -X GET "http://localhost:8080/api/todos/search?keyword=spring"
+```
+
+**Search by Status Only**
+```bash
+curl -X GET "http://localhost:8080/api/todos/search?status=PENDING"
+```
+
+**Search by Keyword and Status**
+```bash
+curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING"
+```
+
+**Search with Pagination**
 ```bash
 curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING&page=0&size=10"
 ```
 
-#### Create Todo
+**Search with Sorting**
+```bash
+curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING&page=0&size=10&sort=todo,asc"
+```
 
+**Available Status Values:**
+- `PENDING`
+- `IN_PROGRESS`
+- `COMPLETED`
+- `CANCELLED`
+
+---
+
+#### 4. Get Todo by ID
+
+**Get Single Todo**
+```bash
+curl -X GET "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+```
+
+**Replace `123e4567-e89b-12d3-a456-426614174000` with an actual UUID from your database.**
+
+**Example with Pretty Print:**
+```bash
+curl -X GET "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" | json_pp
+```
+
+---
+
+#### 5. Create Todo
+
+**Create Todo with All Fields**
 ```bash
 curl -X POST "http://localhost:8080/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Learn Spring Boot",
-    "description": "Complete Spring Boot tutorial",
+    "description": "Complete Spring Boot tutorial and build a REST API",
     "status": "PENDING"
   }'
 ```
 
-#### Update Todo
-
+**Create Todo with Minimal Fields (Status defaults to PENDING)**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/{id}" \
+curl -X POST "http://localhost:8080/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
-    "todo": "Learn Spring Boot - Updated",
-    "description": "Complete Spring Boot tutorial - Updated",
+    "todo": "Learn Spring Boot"
+  }'
+```
+
+**Create Todo with Different Status**
+```bash
+curl -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "todo": "Deploy Application",
+    "description": "Deploy Spring Boot app to production",
     "status": "IN_PROGRESS"
   }'
 ```
 
-#### Delete Todo
+**Create Todo - All Status Options:**
+```bash
+# PENDING
+curl -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{"todo": "Task 1", "status": "PENDING"}'
+
+# IN_PROGRESS
+curl -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{"todo": "Task 2", "status": "IN_PROGRESS"}'
+
+# COMPLETED
+curl -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{"todo": "Task 3", "status": "COMPLETED"}'
+
+# CANCELLED
+curl -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{"todo": "Task 4", "status": "CANCELLED"}'
+```
+
+---
+
+#### 6. Update Todo
+
+**Update All Fields**
+```bash
+curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "todo": "Learn Spring Boot - Updated",
+    "description": "Complete Spring Boot tutorial - Updated description",
+    "status": "IN_PROGRESS"
+  }'
+```
+
+**Update Only Title**
+```bash
+curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "todo": "Updated Todo Title"
+  }'
+```
+
+**Update Only Description**
+```bash
+curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "Updated description only"
+  }'
+```
+
+**Update Only Status**
+```bash
+curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "COMPLETED"
+  }'
+```
+
+**Mark Todo as Completed**
+```bash
+curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "COMPLETED"}'
+```
+
+---
+
+#### 7. Delete Todo
+
+**Delete Todo by ID**
+```bash
+curl -X DELETE "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+```
+
+**Delete with Verbose Output**
+```bash
+curl -v -X DELETE "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+```
+
+---
+
+### Complete Workflow Example
+
+Here's a complete workflow example from creating to deleting a todo:
 
 ```bash
-curl -X DELETE "http://localhost:8080/api/todos/{id}"
+# 1. Create a new todo
+RESPONSE=$(curl -s -X POST "http://localhost:8080/api/todos" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "todo": "Test Todo",
+    "description": "This is a test todo",
+    "status": "PENDING"
+  }')
+
+# Extract the ID from the response (requires jq)
+TODO_ID=$(echo $RESPONSE | jq -r '.id')
+echo "Created Todo ID: $TODO_ID"
+
+# 2. Get the created todo
+curl -X GET "http://localhost:8080/api/todos/$TODO_ID" | json_pp
+
+# 3. Update the todo
+curl -X PUT "http://localhost:8080/api/todos/$TODO_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "IN_PROGRESS"
+  }'
+
+# 4. Mark as completed
+curl -X PUT "http://localhost:8080/api/todos/$TODO_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "COMPLETED"
+  }'
+
+# 5. Delete the todo
+curl -X DELETE "http://localhost:8080/api/todos/$TODO_ID"
+```
+
+---
+
+### Response Examples
+
+#### Success Response (Get All Todos)
+```json
+{
+  "content": [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "todo": "Learn Spring Boot",
+      "description": "Complete Spring Boot tutorial",
+      "status": "PENDING"
+    }
+  ],
+  "page": 0,
+  "size": 10,
+  "totalElements": 1,
+  "totalPages": 1,
+  "first": true,
+  "last": true
+}
+```
+
+#### Success Response (Create Todo)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "todo": "Learn Spring Boot",
+  "description": "Complete Spring Boot tutorial",
+  "status": "PENDING"
+}
+```
+
+#### Error Response (404 Not Found)
+```json
+{
+  "timestamp": "2024-12-15T10:30:00",
+  "status": 404,
+  "error": "Resource Not Found",
+  "message": "Todo not found with id: '123e4567-e89b-12d3-a456-426614174000'",
+  "path": "/api/todos/123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+#### Error Response (400 Bad Request - Validation Error)
+```json
+{
+  "timestamp": "2024-12-15T10:30:00",
+  "status": 400,
+  "error": "Validation Failed",
+  "message": "Invalid input provided",
+  "path": "/api/todos",
+  "details": [
+    "todo: Todo title is required"
+  ]
+}
+```
+
+---
+
+### Tips for Using cURL
+
+1. **Pretty Print JSON**: Pipe output to `json_pp` or `jq`:
+   ```bash
+   curl -X GET "http://localhost:8080/api/todos" | json_pp
+   curl -X GET "http://localhost:8080/api/todos" | jq
+   ```
+
+2. **Save Response to File**:
+   ```bash
+   curl -X GET "http://localhost:8080/api/todos" -o response.json
+   ```
+
+3. **Include Headers in Output**:
+   ```bash
+   curl -i -X GET "http://localhost:8080/api/todos"
+   ```
+
+4. **Verbose Output (Debugging)**:
+   ```bash
+   curl -v -X GET "http://localhost:8080/api/todos"
+   ```
+
+5. **Follow Redirects**:
+   ```bash
+   curl -L -X GET "http://localhost:8080/api/todos"
+   ```
+
+6. **Set Timeout**:
+   ```bash
+   curl --max-time 10 -X GET "http://localhost:8080/api/todos"
+   ```
+
+---
+
+### Actuator Endpoints
+
+Spring Boot Actuator provides additional endpoints for monitoring and managing the application.
+
+#### Health Check
+```bash
+curl -X GET "http://localhost:8080/actuator/health"
+```
+
+**Expected Response:**
+```json
+{
+  "status": "UP"
+}
+```
+
+#### Application Info
+```bash
+curl -X GET "http://localhost:8080/actuator/info"
+```
+
+#### Metrics
+```bash
+curl -X GET "http://localhost:8080/actuator/metrics"
+```
+
+**Get Specific Metric:**
+```bash
+curl -X GET "http://localhost:8080/actuator/metrics/jvm.memory.used"
+```
+
+#### All Available Endpoints
+```bash
+curl -X GET "http://localhost:8080/actuator"
 ```
 
 ## 🌐 Web Interface

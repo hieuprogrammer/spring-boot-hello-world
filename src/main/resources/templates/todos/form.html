@@ -155,13 +155,18 @@
                     </div>
 
                     <!-- Form Actions -->
-                    <div class="flex items-center justify-end space-x-4 pt-4 border-t dark:border-gray-700">
+                    <div class="flex items-center justify-between space-x-4 pt-4 border-t dark:border-gray-700">
+                        <p th:if="${!isTodoWriteEnabled}"
+                           class="text-sm text-yellow-800 dark:text-yellow-200">
+                            Todo write operations are currently disabled by feature flags.
+                        </p>
                         <a href="/todos"
                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
                             Cancel
                         </a>
                         <button type="submit"
-                                class="px-4 py-2 bg-primary dark:bg-blue-600 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                                th:disabled="${!isTodoWriteEnabled}"
+                                class="px-4 py-2 bg-primary dark:bg-blue-600 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <span th:text="${isEdit ? 'Update Todo' : 'Create Todo'}"></span>
                         </button>
                     </div>

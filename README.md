@@ -367,7 +367,7 @@ All API endpoints can be tested using cURL commands. Replace `{id}` with an actu
 For convenience, you can define a `BASE_URL` that points either to your **local** instance or the **production** Render deployment:
 
 ```bash
-# Local
+# Local environment
 export BASE_URL="http://localhost:8080"
 
 # Production (Render)
@@ -424,6 +424,42 @@ curl -X GET "$BASE_URL/api/todos?page=0&size=10&sort=id,desc"
 ```bash
 curl -X GET "$BASE_URL/api/todos?page=0&size=10" | json_pp
 ```
+
+---
+
+### 🔀 Feature Flags (Runtime Toggles)
+
+The application includes runtime-configurable feature flags to turn APIs and UI features on or off without redeploying.
+
+#### Available Flags
+
+- `TODO_WRITE_API` – controls create, update, and delete operations for todos (both REST API and Thymeleaf UI actions).
+- `TODO_SEARCH_API` – controls the `/api/todos/search` endpoint and search/filter functionality in the todo list view.
+
+#### Feature Flag API
+
+- List all flags and their current state:
+
+  ```bash
+  curl -X GET "$BASE_URL/api/features"
+  ```
+
+- Toggle a specific flag on/off:
+
+  ```bash
+  # Disable write operations
+  curl -X PUT "$BASE_URL/api/features/TODO_WRITE_API?enabled=false"
+
+  # Enable search API
+  curl -X PUT "$BASE_URL/api/features/TODO_SEARCH_API?enabled=true"
+  ```
+
+#### Feature Flag UI
+
+- Local: `http://localhost:8080/features`
+- Production (Render): `https://spring-boot-hello-world-603w.onrender.com/features`
+
+From this page you can flip switches to enable/disable features; changes apply immediately to both backend APIs and the frontend UI.
 
 ---
 

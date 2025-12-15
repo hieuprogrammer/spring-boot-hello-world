@@ -1,5 +1,7 @@
 package dev.hieu.springboothelloworld.web.controller;
 
+import dev.hieu.springboothelloworld.configuration.FeatureFlag;
+import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
 import dev.hieu.springboothelloworld.domain.Status;
 import dev.hieu.springboothelloworld.dto.PageResponse;
 import dev.hieu.springboothelloworld.dto.TodoDTO;
@@ -24,6 +26,7 @@ import java.util.UUID;
 public class TodoController {
 
     private final TodoService todoService;
+    private final FeatureFlagService featureFlagService;
 
     @GetMapping
     public String listTodos(
@@ -44,7 +47,9 @@ public class TodoController {
         Pageable pageable = createPageable(page, size, sort);
         PageResponse<TodoDTO> pageResponse;
         
-        if (keyword != null && !keyword.trim().isEmpty() || status != null) {
+        boolean canSearch = featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API);
+
+        if (canSearch && (keyword != null && !keyword.trim().isEmpty() || status != null)) {
             pageResponse = todoService.searchTodos(keyword, status, pageable);
         } else {
             pageResponse = todoService.getAllTodos(pageable);
@@ -75,6 +80,10 @@ public class TodoController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            model.addAttribute("errorMessage", "Todo write operations are currently disabled.");
+            return "redirect:/todos";
+        }
         model.addAttribute("todo", new TodoDTO());
         model.addAttribute("statuses", Status.values());
         model.addAttribute("isEdit", false);
@@ -84,6 +93,10 @@ public class TodoController {
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable UUID id, Model model) {
         try {
+            if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+                model.addAttribute("errorMessage", "Todo write operations are currently disabled.");
+                return "redirect:/todos";
+            }
             TodoDTO todo = todoService.getTodoById(id);
             model.addAttribute("todo", todo);
             model.addAttribute("statuses", Status.values());
@@ -101,7 +114,11 @@ public class TodoController {
             @RequestParam(required = false) String description,
             @RequestParam Status status,
             RedirectAttributes redirectAttributes) {
-        
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo write operations are currently disabled.");
+            return "redirect:/todos";
+        }
+
         try {
             dev.hieu.springboothelloworld.dto.TodoCreateDTO createDTO = 
                 new dev.hieu.springboothelloworld.dto.TodoCreateDTO();
@@ -125,7 +142,11 @@ public class TodoController {
             @RequestParam(required = false) String description,
             @RequestParam Status status,
             RedirectAttributes redirectAttributes) {
-        
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo write operations are currently disabled.");
+            return "redirect:/todos";
+        }
+
         try {
             dev.hieu.springboothelloworld.dto.TodoUpdateDTO updateDTO = 
                 new dev.hieu.springboothelloworld.dto.TodoUpdateDTO();
@@ -144,6 +165,11 @@ public class TodoController {
 
     @PostMapping("/{id}/delete")
     public String deleteTodo(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo write operations are currently disabled.");
+            return "redirect:/todos";
+        }
+
         try {
             todoService.deleteTodo(id);
             redirectAttributes.addFlashAttribute("successMessage", "Todo deleted successfully!");

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Flags - Todo Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                    },
+                    keyframes: {
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(6px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fade-in-up 0.35s ease-out both'
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        // Theme management (match main layout)
+        (function() {
+            const theme = localStorage.getItem('theme') ||
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+<nav class="bg-white dark:bg-gray-800 shadow-lg transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <a href="/todos" class="text-2xl font-bold text-primary dark:text-blue-400 hover:text-primary-dark dark:hover:text-blue-300 transition-colors transition-transform duration-150 hover:-translate-y-0.5">
+                    📝 Todo Manager
+                </a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleTheme()"
+                        class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors transition-transform duration-150 hover:-translate-y-0.5"
+                        aria-label="Toggle dark mode">
+                    <span class="dark:hidden">🌙</span>
+                    <span class="hidden dark:inline">☀️</span>
+                </button>
+                <a href="/todos" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-transform duration-150 hover:-translate-y-0.5">
+                    All Todos
+                </a>
+                <a href="/todos/new"
+                   th:if="${isTodoWriteEnabled}"
+                   class="bg-primary dark:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors transition-transform duration-150 hover:-translate-y-0.5">
+                    + New Todo
+                </a>
+                <a href="/features" class="hidden sm:inline-block text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-transform duration-150 hover:-translate-y-0.5">
+                    Feature Flags
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-5xl mx-auto py-8 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div class="px-4 sm:px-0">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Feature Flags</h1>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Toggle features on or off at runtime. Changes apply immediately to both the REST API and the web UI.
+        </p>
+
+        <div id="feature-flags"
+             class="bg-white dark:bg-gray-800 shadow rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+            <!-- Rows will be injected by JavaScript -->
+        </div>
+
+        <p id="feature-flags-error"
+           class="mt-4 text-sm text-red-600 dark:text-red-400 hidden">
+            Failed to load feature flags. Please check the console for details.
+        </p>
+    </div>
+</main>
+
+<footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-auto transition-colors duration-200">
+    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p class="text-center sm:text-left text-gray-500 dark:text-gray-400 text-sm">
+            © 2024 Todo Management System - Built with Spring Boot &amp; Thymeleaf
+        </p>
+        <p class="text-center sm:text-right text-gray-500 dark:text-gray-400 text-sm">
+            View source on
+            <a href="https://github.com/hieuprogrammer/spring-boot-hello-world"
+               class="text-primary dark:text-blue-400 hover:underline"
+               target="_blank" rel="noopener noreferrer">
+                GitHub
+            </a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    const FLAG_DESCRIPTIONS = {
+        'TODO_WRITE_API': 'Enable create, update, and delete operations for todos (API + UI).',
+        'TODO_SEARCH_API': 'Enable search API and search/filter functionality on the todo list.'
+    };
+
+    async function loadFeatureFlags() {
+        try {
+            const response = await fetch('/api/features');
+            if (!response.ok) {
+                throw new Error('Failed to fetch feature flags');
+            }
+            const data = await response.json();
+            renderFeatureFlags(data);
+        } catch (err) {
+            console.error(err);
+            document.getElementById('feature-flags-error').classList.remove('hidden');
+        }
+    }
+
+    function renderFeatureFlags(flags) {
+        const container = document.getElementById('feature-flags');
+        container.innerHTML = '';
+
+        Object.keys(flags).forEach(name => {
+            const enabled = !!flags[name];
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between px-4 py-4';
+
+            const label = document.createElement('div');
+            label.className = 'flex flex-col';
+            const title = document.createElement('span');
+            title.className = 'font-medium text-gray-900 dark:text-white';
+            title.textContent = name;
+            const desc = document.createElement('span');
+            desc.className = 'text-sm text-gray-600 dark:text-gray-300';
+            desc.textContent = FLAG_DESCRIPTIONS[name] || '';
+            label.appendChild(title);
+            label.appendChild(desc);
+
+            const toggleWrapper = document.createElement('label');
+            toggleWrapper.className = 'inline-flex items-center cursor-pointer';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'sr-only peer';
+            input.checked = enabled;
+            input.addEventListener('change', () => updateFeatureFlag(name, input.checked));
+
+            const visual = document.createElement('div');
+            visual.className = 'w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary ' +
+                'rounded-full peer dark:bg-gray-700 peer-checked:bg-primary relative transition-colors';
+
+            const knob = document.createElement('div');
+            knob.className = 'absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full shadow transform ' +
+                'transition-transform peer-checked:translate-x-5';
+            visual.appendChild(knob);
+
+            toggleWrapper.appendChild(input);
+            toggleWrapper.appendChild(visual);
+
+            row.appendChild(label);
+            row.appendChild(toggleWrapper);
+            container.appendChild(row);
+        });
+    }
+
+    async function updateFeatureFlag(name, enabled) {
+        try {
+            const params = new URLSearchParams({ enabled: String(enabled) });
+            const response = await fetch(`/api/features/${name}?` + params.toString(), {
+                method: 'PUT'
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update feature flag');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update feature flag. See console for details.');
+            // Reload flags to reflect actual state on error
+            loadFeatureFlags();
+        }
+    }
+
+    loadFeatureFlags();
+</script>
+</body>
+</html>
+
+

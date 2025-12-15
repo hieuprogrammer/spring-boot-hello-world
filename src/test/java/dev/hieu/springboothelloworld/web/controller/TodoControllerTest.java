@@ -1,5 +1,7 @@
 package dev.hieu.springboothelloworld.web.controller;
 
+import dev.hieu.springboothelloworld.configuration.FeatureFlag;
+import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
 import dev.hieu.springboothelloworld.domain.Status;
 import dev.hieu.springboothelloworld.dto.PageResponse;
 import dev.hieu.springboothelloworld.dto.TodoDTO;
@@ -35,6 +37,9 @@ class TodoControllerTest {
     @Mock
     private RedirectAttributes redirectAttributes;
 
+    @Mock
+    private FeatureFlagService featureFlagService;
+
     @InjectMocks
     private TodoController todoController;
 
@@ -62,6 +67,7 @@ class TodoControllerTest {
     @Test
     void listTodos_WithoutFilters_ShouldReturnListPage() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -84,6 +90,7 @@ class TodoControllerTest {
     @Test
     void listTodos_WithPageSizeTooSmall_ShouldClampToMinimum() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> clampedResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1),
                 0, 1, 1, 1, true, true
@@ -101,6 +108,7 @@ class TodoControllerTest {
     @Test
     void listTodos_WithPageSizeTooLarge_ShouldClampToMaximum() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> clampedResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1, todoDTO2),
                 0, 100, 2, 1, true, true
@@ -118,6 +126,7 @@ class TodoControllerTest {
     @Test
     void listTodos_WithPageOutOfBounds_ShouldRedirectToLastPage() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> emptyResponse = new PageResponse<>(
                 Arrays.asList(),
                 0, 10, 0, 1, true, true
@@ -142,6 +151,7 @@ class TodoControllerTest {
                 Arrays.asList(),
                 0, 10, 0, 1, true, true
         );
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.searchTodos(eq(keyword), eq(status), any(Pageable.class))).thenReturn(emptyResponse);
 
         // When - page = 5 but totalPages = 1, should redirect to page 0 and keep filters
@@ -155,6 +165,7 @@ class TodoControllerTest {
     void listTodos_WithKeyword_ShouldUseSearch() {
         // Given
         String keyword = "Test";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.searchTodos(eq(keyword), isNull(), any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -170,6 +181,7 @@ class TodoControllerTest {
     void listTodos_WithStatus_ShouldUseSearch() {
         // Given
         Status status = Status.PENDING;
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.searchTodos(isNull(), eq(status), any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -186,6 +198,7 @@ class TodoControllerTest {
         // Given
         String keyword = "Test";
         Status status = Status.PENDING;
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.searchTodos(eq(keyword), eq(status), any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -201,6 +214,7 @@ class TodoControllerTest {
     void listTodos_WithEmptyKeyword_ShouldNotUseSearch() {
         // Given
         String keyword = "   ";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -216,6 +230,7 @@ class TodoControllerTest {
     void listTodos_WithSort_ShouldCreatePageableWithSort() {
         // Given
         String sort = "todo,asc";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -230,6 +245,7 @@ class TodoControllerTest {
     void listTodos_WithDescSort_ShouldCreatePageableWithDescSort() {
         // Given
         String sort = "status,desc";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -244,6 +260,7 @@ class TodoControllerTest {
     void listTodos_WithInvalidSort_ShouldIgnoreSort() {
         // Given
         String sort = "invalidField,asc";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -258,6 +275,7 @@ class TodoControllerTest {
     void listTodos_WithMalformedSort_ShouldIgnoreSort() {
         // Given
         String sort = "todo";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         when(todoService.getAllTodos(any(Pageable.class))).thenReturn(pageResponse);
 
         // When
@@ -270,6 +288,7 @@ class TodoControllerTest {
 
     @Test
     void showCreateForm_ShouldReturnFormPage() {
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         // When
         String viewName = todoController.showCreateForm(model);
 
@@ -283,6 +302,7 @@ class TodoControllerTest {
     @Test
     void showEditForm_ShouldReturnFormPageWithTodo() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.getTodoById(todoId1)).thenReturn(todoDTO1);
 
         // When
@@ -300,6 +320,7 @@ class TodoControllerTest {
     void showEditForm_WhenTodoNotFound_ShouldRedirectWithErrorMessage() {
         // Given
         String errorMessage = "Todo not found";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.getTodoById(todoId1)).thenThrow(new dev.hieu.springboothelloworld.exception.ResourceNotFoundException(errorMessage));
 
         // When
@@ -322,6 +343,7 @@ class TodoControllerTest {
         createdDTO.setDescription(description);
         createdDTO.setStatus(status);
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.createTodo(any())).thenReturn(createdDTO);
 
         // When
@@ -345,6 +367,7 @@ class TodoControllerTest {
         createdDTO.setTodo(todo);
         createdDTO.setStatus(status);
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.createTodo(any())).thenReturn(createdDTO);
 
         // When
@@ -364,6 +387,7 @@ class TodoControllerTest {
         Status status = Status.PENDING;
         String errorMessage = "Service error";
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.createTodo(any())).thenThrow(new RuntimeException(errorMessage));
 
         // When
@@ -388,6 +412,7 @@ class TodoControllerTest {
         updatedDTO.setDescription(description);
         updatedDTO.setStatus(status);
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.updateTodo(eq(todoId1), any())).thenReturn(updatedDTO);
 
         // When
@@ -411,6 +436,7 @@ class TodoControllerTest {
         updatedDTO.setTodo(todo);
         updatedDTO.setStatus(status);
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.updateTodo(eq(todoId1), any())).thenReturn(updatedDTO);
 
         // When
@@ -430,6 +456,7 @@ class TodoControllerTest {
         Status status = Status.COMPLETED;
         String errorMessage = "Todo not found";
 
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         when(todoService.updateTodo(eq(todoId1), any())).thenThrow(new RuntimeException(errorMessage));
 
         // When
@@ -445,6 +472,7 @@ class TodoControllerTest {
     @Test
     void deleteTodo_Success_ShouldRedirectWithSuccessMessage() {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         doNothing().when(todoService).deleteTodo(todoId1);
 
         // When
@@ -461,6 +489,7 @@ class TodoControllerTest {
     void deleteTodo_WithException_ShouldRedirectWithErrorMessage() {
         // Given
         String errorMessage = "Todo not found";
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         doThrow(new RuntimeException(errorMessage)).when(todoService).deleteTodo(todoId1);
 
         // When

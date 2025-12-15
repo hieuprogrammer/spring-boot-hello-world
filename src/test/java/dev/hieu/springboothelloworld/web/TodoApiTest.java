@@ -3,6 +3,8 @@ package dev.hieu.springboothelloworld.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.hieu.springboothelloworld.domain.Status;
 import dev.hieu.springboothelloworld.dto.*;
+import dev.hieu.springboothelloworld.configuration.FeatureFlag;
+import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
 import dev.hieu.springboothelloworld.service.TodoService;
 import dev.hieu.springboothelloworld.web.api.TodoApi;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,9 @@ class TodoApiTest {
 
     @MockBean
     private TodoService todoService;
+
+    @MockBean
+    private FeatureFlagService featureFlagService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -60,6 +65,7 @@ class TodoApiTest {
     @Test
     void getAllTodos_ShouldReturnPageResponse() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(any())).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1, todoDTO2),
                 0, 10, 2, 1, true, true
@@ -84,6 +90,7 @@ class TodoApiTest {
     @Test
     void getAllTodos_WithSorting_ShouldReturnSortedResults() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(any())).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1, todoDTO2),
                 0, 10, 2, 1, true, true
@@ -103,6 +110,7 @@ class TodoApiTest {
     @Test
     void searchTodos_WithKeyword_ShouldReturnFilteredResults() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1),
                 0, 10, 1, 1, true, true
@@ -124,6 +132,7 @@ class TodoApiTest {
     @Test
     void searchTodos_WithStatus_ShouldReturnFilteredResults() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1),
                 0, 10, 1, 1, true, true
@@ -144,6 +153,7 @@ class TodoApiTest {
     @Test
     void getTodoById_WhenExists_ShouldReturnTodo() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(any())).thenReturn(true);
         when(todoService.getTodoById(todoId1)).thenReturn(todoDTO1);
 
         // When & Then
@@ -160,6 +170,7 @@ class TodoApiTest {
     @Test
     void createTodo_WithValidData_ShouldCreateAndReturnTodo() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         TodoCreateDTO createDTO = new TodoCreateDTO();
         createDTO.setTodo("New Todo");
         createDTO.setDescription("New Description");
@@ -187,6 +198,7 @@ class TodoApiTest {
     @Test
     void createTodo_WithInvalidData_ShouldReturnBadRequest() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         TodoCreateDTO createDTO = new TodoCreateDTO();
         createDTO.setTodo(""); // Invalid: empty string
 
@@ -202,6 +214,7 @@ class TodoApiTest {
     @Test
     void updateTodo_WithValidData_ShouldUpdateAndReturnTodo() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         TodoUpdateDTO updateDTO = new TodoUpdateDTO();
         updateDTO.setTodo("Updated Todo");
         updateDTO.setStatus(Status.COMPLETED);
@@ -228,6 +241,7 @@ class TodoApiTest {
     @Test
     void deleteTodo_WhenExists_ShouldReturnNoContent() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)).thenReturn(true);
         doNothing().when(todoService).deleteTodo(todoId1);
 
         // When & Then
@@ -382,6 +396,7 @@ class TodoApiTest {
     @Test
     void searchTodos_WithKeywordAndStatus_ShouldReturnFilteredResults() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1),
                 0, 10, 1, 1, true, true
@@ -403,6 +418,7 @@ class TodoApiTest {
     @Test
     void searchTodos_WithSorting_ShouldWork() throws Exception {
         // Given
+        when(featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)).thenReturn(true);
         PageResponse<TodoDTO> pageResponse = new PageResponse<>(
                 Arrays.asList(todoDTO1),
                 0, 10, 1, 1, true, true

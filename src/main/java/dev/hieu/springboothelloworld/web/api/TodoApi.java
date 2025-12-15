@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.hieu.springboothelloworld.configuration.FeatureFlag;
+import dev.hieu.springboothelloworld.configuration.FeatureFlagService;
 import dev.hieu.springboothelloworld.domain.Status;
 import dev.hieu.springboothelloworld.dto.PageResponse;
 import dev.hieu.springboothelloworld.dto.TodoCreateDTO;
@@ -40,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 public class TodoApi {
 
     private final TodoService todoService;
+    private final FeatureFlagService featureFlagService;
 
     @Operation(
             summary = "Get all todos",
@@ -88,6 +91,10 @@ public class TodoApi {
             @Parameter(description = "Sort by field and direction (e.g., 'todo,asc' or 'status,desc')", example = "status,asc")
             @RequestParam(required = false) String sort) {
 
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_SEARCH_API)) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
+
         Pageable pageable = createPageable(page, size, sort);
         PageResponse<TodoDTO> response = todoService.searchTodos(keyword, status, pageable);
         return ResponseEntity.ok(response);
@@ -123,6 +130,9 @@ public class TodoApi {
     public ResponseEntity<TodoDTO> createTodo(
             @Parameter(description = "Todo creation data")
             @Valid @RequestBody TodoCreateDTO todoCreateDTO) {
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
         TodoDTO createdTodo = todoService.createTodo(todoCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTodo);
     }
@@ -143,6 +153,9 @@ public class TodoApi {
             @PathVariable UUID id,
             @Parameter(description = "Todo update data")
             @Valid @RequestBody TodoUpdateDTO todoUpdateDTO) {
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
         TodoDTO updatedTodo = todoService.updateTodo(id, todoUpdateDTO);
         return ResponseEntity.ok(updatedTodo);
     }
@@ -159,6 +172,9 @@ public class TodoApi {
     public ResponseEntity<Void> deleteTodo(
             @Parameter(description = "Todo UUID", example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID id) {
+        if (!featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API)) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        }
         todoService.deleteTodo(id);
         return ResponseEntity.noContent().build();
     }

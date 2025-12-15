@@ -13,6 +13,15 @@
                     colors: {
                         primary: '#3b82f6',
                         secondary: '#8b5cf6',
+                    },
+                    keyframes: {
+                        'fade-in-up': {
+                            '0%': { opacity: '0', transform: 'translateY(6px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fade-in-up 0.35s ease-out both'
                     }
                 }
             }
@@ -88,22 +97,28 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/todos" class="text-2xl font-bold text-primary dark:text-blue-400 hover:text-primary-dark dark:hover:text-blue-300 transition-colors">
+                    <a href="/todos" class="text-2xl font-bold text-primary dark:text-blue-400 hover:text-primary-dark dark:hover:text-blue-300 transition-colors transition-transform duration-150 hover:-translate-y-0.5">
                         📝 Todo Manager
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button onclick="toggleTheme()"
-                            class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors transition-transform duration-150 hover:-translate-y-0.5"
                             aria-label="Toggle dark mode">
                         <span class="dark:hidden">🌙</span>
                         <span class="hidden dark:inline">☀️</span>
                     </button>
-                    <a href="/todos" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <a href="/todos" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-transform duration-150 hover:-translate-y-0.5">
                         All Todos
                     </a>
-                    <a href="/todos/new" class="bg-primary dark:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
+                    <a href="/todos/new"
+                       th:if="${isTodoWriteEnabled}"
+                       class="bg-primary dark:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors transition-transform duration-150 hover:-translate-y-0.5">
                         + New Todo
+                    </a>
+                    <a href="/features"
+                       class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-transform duration-150 hover:-translate-y-0.5">
+                        Feature Flags
                     </a>
                 </div>
             </div>
@@ -131,7 +146,7 @@
                 </span>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 shadow rounded-lg transition-colors duration-200">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg transition-colors duration-200 animate-fade-in-up">
             <div class="px-4 py-5 sm:p-6">
                 <!-- Header -->
                 <div class="mb-6">
@@ -152,53 +167,68 @@
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
                         </div>
 
-                        <div class="w-full md:w-48">
+                        <div class="w-full md:w-48" th:if="${isTodoSearchEnabled}">
                             <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                            <select id="status"
-                                    name="status"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
-                                <option value="">All Statuses</option>
-                                <option th:each="s : ${statuses}"
-                                        th:value="${s}"
-                                        th:text="${s.displayName}"
-                                        th:selected="${statusFilter == s}"></option>
-                            </select>
+                            <div class="relative">
+                                <select id="status"
+                                        name="status"
+                                        class="w-full px-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary appearance-none">
+                                    <option value="">All Statuses</option>
+                                    <option th:each="s : ${statuses}"
+                                            th:value="${s}"
+                                            th:text="${s.displayName}"
+                                            th:selected="${statusFilter == s}"></option>
+                                </select>
+                                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                    ▾
+                                </span>
+                            </div>
                         </div>
 
                         <div class="w-full md:w-32">
                             <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sort By</label>
-                            <select id="sort"
-                                    name="sort"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
-                                <option value="">Default</option>
-                                <option value="todo,asc" th:selected="${sort == 'todo,asc'}">Title (A-Z)</option>
-                                <option value="todo,desc" th:selected="${sort == 'todo,desc'}">Title (Z-A)</option>
-                                <option value="status,asc" th:selected="${sort == 'status,asc'}">Status (A-Z)</option>
-                                <option value="status,desc" th:selected="${sort == 'status,desc'}">Status (Z-A)</option>
-                                <option value="id,desc" th:selected="${sort == 'id,desc'}">Newest First</option>
-                            </select>
+                            <div class="relative">
+                                <select id="sort"
+                                        name="sort"
+                                        class="w-full px-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary appearance-none">
+                                    <option value="">Default</option>
+                                    <option value="todo,asc" th:selected="${sort == 'todo,asc'}">Title (A-Z)</option>
+                                    <option value="todo,desc" th:selected="${sort == 'todo,desc'}">Title (Z-A)</option>
+                                    <option value="status,asc" th:selected="${sort == 'status,asc'}">Status (A-Z)</option>
+                                    <option value="status,desc" th:selected="${sort == 'status,desc'}">Status (Z-A)</option>
+                                    <option value="id,desc" th:selected="${sort == 'id,desc'}">Newest First</option>
+                                </select>
+                                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                    ▾
+                                </span>
+                            </div>
                         </div>
 
                         <div class="w-full md:w-40">
                             <label for="size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
-                            <select id="size"
-                                    name="size"
-                                    onchange="changePageSize(0, this.value)"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
-                                <option value="5" th:selected="${pageSize == 5}">5</option>
-                                <option value="10" th:selected="${pageSize == 10}">10</option>
-                                <option value="15" th:selected="${pageSize == 15}">15</option>
-                                <option value="20" th:selected="${pageSize == 20}">20</option>
-                                <option value="25" th:selected="${pageSize == 25}">25</option>
-                                <option value="50" th:selected="${pageSize == 50}">50</option>
-                                <option value="75" th:selected="${pageSize == 75}">75</option>
-                                <option value="100" th:selected="${pageSize == 100}">100</option>
-                            </select>
+                            <div class="relative">
+                                <select id="size"
+                                        name="size"
+                                        onchange="changePageSize(0, this.value)"
+                                        class="w-full px-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary appearance-none">
+                                    <option value="5" th:selected="${pageSize == 5}">5</option>
+                                    <option value="10" th:selected="${pageSize == 10}">10</option>
+                                    <option value="15" th:selected="${pageSize == 15}">15</option>
+                                    <option value="20" th:selected="${pageSize == 20}">20</option>
+                                    <option value="25" th:selected="${pageSize == 25}">25</option>
+                                    <option value="50" th:selected="${pageSize == 50}">50</option>
+                                    <option value="75" th:selected="${pageSize == 75}">75</option>
+                                    <option value="100" th:selected="${pageSize == 100}">100</option>
+                                </select>
+                                <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                    ▾
+                                </span>
+                            </div>
                         </div>
 
                         <input type="hidden" name="page" id="pageInput" th:value="${currentPage}">
 
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-2" th:if="${isTodoSearchEnabled}">
                             <button type="submit"
                                     class="px-4 py-2 bg-primary dark:bg-blue-600 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors">
                                 🔍 Filter
@@ -209,6 +239,11 @@
                             </a>
                         </div>
                     </form>
+
+                    <div th:if="${!isTodoSearchEnabled}"
+                         class="mt-4 text-sm text-yellow-800 dark:text-yellow-200 bg-yellow-50 dark:bg-yellow-900 px-4 py-3 rounded">
+                        Search and filter functionality is currently disabled by feature flags.
+                    </div>
                 </div>
 
                 <!-- Todo Table -->
@@ -225,7 +260,11 @@
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             <tr th:if="${#lists.isEmpty(todos)}">
                                 <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                                    No todos found. <a href="/todos/new" class="text-primary dark:text-blue-400 hover:underline">Create one?</a>
+                                    <span>No todos found.</span>
+                                    <a th:if="${isTodoWriteEnabled}" href="/todos/new"
+                                       class="ml-1 text-primary dark:text-blue-400 hover:underline">
+                                        Create one?
+                                    </a>
                                 </td>
                             </tr>
                             <tr th:each="todo : ${todos}" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -260,15 +299,19 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a th:href="@{/todos/{id}/edit(id=${todo.id})}"
-                                       class="text-primary dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 mr-4 transition-colors">✏️ Edit</a>
-                                    <form th:action="@{/todos/{id}/delete(id=${todo.id})}"
-                                          method="post"
-                                          class="inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this todo?');">
-                                        <button type="submit"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">🗑️ Delete</button>
-                                    </form>
+                                    <div th:if="${isTodoWriteEnabled}">
+                                        <a th:href="@{/todos/{id}/edit(id=${todo.id})}"
+                                           class="text-primary dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 mr-4 transition-colors">✏️ Edit</a>
+                                        <form th:action="@{/todos/{id}/delete(id=${todo.id})}"
+                                              method="post"
+                                              class="inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this todo?');">
+                                            <button type="submit"
+                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">🗑️ Delete</button>
+                                        </form>
+                                    </div>
+                                    <span th:if="${!isTodoWriteEnabled}"
+                                          class="text-gray-400 dark:text-gray-500 italic">Read-only</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -284,18 +327,23 @@
                     </div>
                     <div class="flex items-center space-x-2">
                         <label for="pageSizeSelect" class="text-sm font-medium text-gray-700 dark:text-gray-300">Items per page:</label>
-                        <select id="pageSizeSelect"
-                                onchange="changePageSize(0, this.value)"
-                                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary text-sm">
-                            <option value="5" th:selected="${pageSize == 5}">5</option>
-                            <option value="10" th:selected="${pageSize == 10}">10</option>
-                            <option value="15" th:selected="${pageSize == 15}">15</option>
-                            <option value="20" th:selected="${pageSize == 20}">20</option>
-                            <option value="25" th:selected="${pageSize == 25}">25</option>
-                            <option value="50" th:selected="${pageSize == 50}">50</option>
-                            <option value="75" th:selected="${pageSize == 75}">75</option>
-                            <option value="100" th:selected="${pageSize == 100}">100</option>
-                        </select>
+                        <div class="relative">
+                            <select id="pageSizeSelect"
+                                    onchange="changePageSize(0, this.value)"
+                                    class="px-3 pr-10 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary text-sm appearance-none">
+                                <option value="5" th:selected="${pageSize == 5}">5</option>
+                                <option value="10" th:selected="${pageSize == 10}">10</option>
+                                <option value="15" th:selected="${pageSize == 15}">15</option>
+                                <option value="20" th:selected="${pageSize == 20}">20</option>
+                                <option value="25" th:selected="${pageSize == 25}">25</option>
+                                <option value="50" th:selected="${pageSize == 50}">50</option>
+                                <option value="75" th:selected="${pageSize == 75}">75</option>
+                                <option value="100" th:selected="${pageSize == 100}">100</option>
+                            </select>
+                            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                                ▾
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -340,9 +388,17 @@
     </main>
 
     <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-auto transition-colors duration-200">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
-                © 2024 Todo Management System - Built with Spring Boot & Thymeleaf
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p class="text-center sm:text-left text-gray-500 dark:text-gray-400 text-sm">
+                © 2024 Todo Management System - Built with Spring Boot &amp; Thymeleaf
+            </p>
+            <p class="text-center sm:text-right text-gray-500 dark:text-gray-400 text-sm">
+                View source on
+                <a href="https://github.com/hieuprogrammer/spring-boot-hello-world"
+                   class="text-primary dark:text-blue-400 hover:underline"
+                   target="_blank" rel="noopener noreferrer">
+                    GitHub
+                </a>
             </p>
         </div>
     </footer>

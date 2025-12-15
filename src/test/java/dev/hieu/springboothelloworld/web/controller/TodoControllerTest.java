@@ -133,6 +133,25 @@ class TodoControllerTest {
     }
 
     @Test
+    void listTodos_WithPageOutOfBoundsAndFilters_ShouldRedirectWithAllQueryParams() {
+        // Given
+        String sort = "todo,asc";
+        String keyword = "Test";
+        Status status = Status.PENDING;
+        PageResponse<TodoDTO> emptyResponse = new PageResponse<>(
+                Arrays.asList(),
+                0, 10, 0, 1, true, true
+        );
+        when(todoService.searchTodos(eq(keyword), eq(status), any(Pageable.class))).thenReturn(emptyResponse);
+
+        // When - page = 5 but totalPages = 1, should redirect to page 0 and keep filters
+        String result = todoController.listTodos(5, 10, sort, keyword, status, model);
+
+        // Then
+        assertEquals("redirect:/todos?page=0&size=10&sort=todo,asc&keyword=Test&status=PENDING", result);
+    }
+
+    @Test
     void listTodos_WithKeyword_ShouldUseSearch() {
         // Given
         String keyword = "Test";
@@ -275,6 +294,20 @@ class TodoControllerTest {
         verify(model, times(1)).addAttribute("todo", todoDTO1);
         verify(model, times(1)).addAttribute("statuses", Status.values());
         verify(model, times(1)).addAttribute("isEdit", true);
+    }
+
+    @Test
+    void showEditForm_WhenTodoNotFound_ShouldRedirectWithErrorMessage() {
+        // Given
+        String errorMessage = "Todo not found";
+        when(todoService.getTodoById(todoId1)).thenThrow(new dev.hieu.springboothelloworld.exception.ResourceNotFoundException(errorMessage));
+
+        // When
+        String viewName = todoController.showEditForm(todoId1, model);
+
+        // Then
+        assertEquals("redirect:/todos", viewName);
+        verify(model, times(1)).addAttribute("errorMessage", errorMessage);
     }
 
     @Test
@@ -537,6 +570,35 @@ class TodoControllerTest {
         assertFalse(invokeIsValidSortProperty("createdAt"));
     }
 
+    @Test
+    void calculatePageNumbers_WhenTotalPagesSmall_ShouldReturnAllPages() {
+        // totalPages <= 7 branch
+        List<Integer> pageNumbers = invokeCalculatePageNumbers(2, 5);
+        assertEquals(List.of(0, 1, 2, 3, 4), pageNumbers);
+    }
+
+    @Test
+    void calculatePageNumbers_WhenInMiddleOfLargeSet_ShouldIncludeEllipsisAndNeighbors() {
+        // totalPages > 7 and current page in the middle
+        List<Integer> pageNumbers = invokeCalculatePageNumbers(5, 10);
+        // Expect: first page, ellipsis, 3–7, ellipsis, last page
+        assertEquals(List.of(0, -1, 3, 4, 5, 6, 7, -1, 9), pageNumbers);
+    }
+
+    @Test
+    void calculatePageNumbers_WhenNearStartOfLargeSet_ShouldNotHaveLeadingEllipsis() {
+        List<Integer> pageNumbers = invokeCalculatePageNumbers(1, 10);
+        // Expect pages 0–3, ellipsis, last page
+        assertEquals(List.of(0, 1, 2, 3, -1, 9), pageNumbers);
+    }
+
+    @Test
+    void calculatePageNumbers_WhenNearEndOfLargeSet_ShouldNotHaveTrailingEllipsis() {
+        List<Integer> pageNumbers = invokeCalculatePageNumbers(8, 10);
+        // Expect first page, ellipsis, 6–9
+        assertEquals(List.of(0, -1, 6, 7, 8, 9), pageNumbers);
+    }
+
     // Helper methods to test private methods via reflection
     private Pageable invokeCreatePageable(int page, int size, String sort) {
         try {
@@ -555,6 +617,19 @@ class TodoControllerTest {
                     "isValidSortProperty", String.class);
             method.setAccessible(true);
             return (Boolean) method.invoke(todoController, property);
+        } catch (java.lang.reflect.InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Integer> invokeCalculatePageNumbers(int currentPage, int totalPages) {
+        try {
+            java.lang.reflect.Method method = TodoController.class.getDeclaredMethod(
+                    "calculatePageNumbers", int.class, int.class);
+            method.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<Integer> result = (List<Integer>) method.invoke(todoController, currentPage, totalPages);
+            return result;
         } catch (java.lang.reflect.InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

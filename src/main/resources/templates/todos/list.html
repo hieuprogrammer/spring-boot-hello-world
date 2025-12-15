@@ -40,30 +40,35 @@
             }
         }
 
-        // Page size management with dropdown only
+        // Page size management – keep both dropdowns in sync and navigate on change
         function changePageSize(delta, customValue) {
-            const select = document.getElementById('pageSizeSelect');
-            const input = document.getElementById('pageSizeInput');
+            const topSelect = document.getElementById('size');
+            const bottomSelect = document.getElementById('pageSizeSelect');
+
             let newSize;
-            
+
             if (customValue !== undefined) {
-                newSize = parseInt(customValue);
+                newSize = parseInt(customValue, 10);
             } else if (delta !== 0) {
-                const currentSize = parseInt(select.value) || parseInt(input.value) || 10;
+                const currentSize = parseInt(bottomSelect?.value || topSelect?.value || '10', 10);
                 newSize = Math.max(1, Math.min(100, currentSize + delta));
             } else {
-                newSize = parseInt(select.value) || 10;
+                newSize = parseInt(bottomSelect?.value || topSelect?.value || '10', 10);
             }
-            
-            if (newSize < 1 || newSize > 100) {
+
+            if (isNaN(newSize) || newSize < 1 || newSize > 100) {
                 alert('Page size must be between 1 and 100');
                 return;
             }
-            
-            // Update both select and input
-            select.value = newSize;
-            input.value = newSize;
-            
+
+            // Update both dropdowns so they stay synchronized
+            if (topSelect) {
+                topSelect.value = String(newSize);
+            }
+            if (bottomSelect) {
+                bottomSelect.value = String(newSize);
+            }
+
             // Build URL with new page size, reset to page 0
             const url = new URL(window.location.href);
             url.searchParams.set('size', newSize);
@@ -178,6 +183,7 @@
                             <label for="size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
                             <select id="size"
                                     name="size"
+                                    onchange="changePageSize(0, this.value)"
                                     class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
                                 <option value="5" th:selected="${pageSize == 5}">5</option>
                                 <option value="10" th:selected="${pageSize == 10}">10</option>
@@ -231,19 +237,27 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span th:if="${todo.status != null}" th:switch="${todo.status.name()}"
-                                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                        <span th:case="'PENDING'" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                                          class="inline-block">
+                                        <span th:case="'PENDING'"
+                                              class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 shadow-sm"
                                               th:text="${'⏳ ' + todo.status.displayName}">⏳ Pending</span>
-                                        <span th:case="'IN_PROGRESS'" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                                        <span th:case="'IN_PROGRESS'"
+                                              class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 shadow-sm"
                                               th:text="${'🔄 ' + todo.status.displayName}">🔄 In Progress</span>
-                                        <span th:case="'COMPLETED'" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                                        <span th:case="'COMPLETED'"
+                                              class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 shadow-sm"
                                               th:text="${'✅ ' + todo.status.displayName}">✅ Completed</span>
-                                        <span th:case="'CANCELLED'" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                                        <span th:case="'CANCELLED'"
+                                              class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 shadow-sm"
                                               th:text="${'❌ ' + todo.status.displayName}">❌ Cancelled</span>
-                                        <span th:case="*" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                                        <span th:case="*"
+                                              class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm"
                                               th:text="${todo.status.displayName ?: todo.status}">Unknown</span>
                                     </span>
-                                    <span th:if="${todo.status == null}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">No Status</span>
+                                    <span th:if="${todo.status == null}"
+                                          class="inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm">
+                                        No Status
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a th:href="@{/todos/{id}/edit(id=${todo.id})}"

@@ -197,10 +197,10 @@
                 const selectedStatus = statusSelect.value;
                 if (selectedStatus && statusStyles[selectedStatus]) {
                     const style = statusStyles[selectedStatus];
-                    statusPreview.className = `inline-block px-3 py-1 rounded-full text-sm font-semibold ${style.bg} ${style.text}`;
+                    statusPreview.className = `inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold shadow-sm ${style.bg} ${style.text}`;
                     statusText.textContent = `${style.emoji} ${style.label}`;
                 } else {
-                    statusPreview.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+                    statusPreview.className = 'inline-flex items-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold shadow-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
                     statusText.textContent = 'Select a status';
                 }
             }

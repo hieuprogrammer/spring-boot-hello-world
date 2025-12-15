@@ -164,6 +164,9 @@ public class TodoApi {
     }
 
     private Pageable createPageable(int page, int size, String sort) {
+        // Clamp page/size to sensible bounds to avoid IllegalArgumentException from PageRequest
+        int sanitizedPage = Math.max(0, page);
+        int sanitizedSize = Math.max(1, Math.min(size, 100));
         Sort sortObj = Sort.unsorted();
 
         if (sort != null && !sort.trim().isEmpty()) {
@@ -181,7 +184,7 @@ public class TodoApi {
             }
         }
 
-        return PageRequest.of(page, size, sortObj);
+        return PageRequest.of(sanitizedPage, sanitizedSize, sortObj);
     }
 
     private boolean isValidSortProperty(String property) {

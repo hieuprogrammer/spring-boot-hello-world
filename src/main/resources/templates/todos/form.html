@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -17,21 +18,49 @@
             }
         }
     </script>
+    <script>
+        // Theme management
+        (function() {
+            const theme = localStorage.getItem('theme') ||
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <nav class="bg-white shadow-lg">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+    <nav class="bg-white dark:bg-gray-800 shadow-lg transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/todos" class="text-2xl font-bold text-primary hover:text-primary-dark">
+                    <a href="/todos" class="text-2xl font-bold text-primary dark:text-blue-400 hover:text-primary-dark dark:hover:text-blue-300 transition-colors">
                         📝 Todo Manager
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/todos" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                    <button onclick="toggleTheme()"
+                            class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            aria-label="Toggle dark mode">
+                        <span class="dark:hidden">🌙</span>
+                        <span class="hidden dark:inline">☀️</span>
+                    </button>
+                    <a href="/todos" class="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                         All Todos
                     </a>
-                    <a href="/todos/new" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600">
+                    <a href="/todos/new" class="bg-primary dark:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
                         + New Todo
                     </a>
                 </div>
@@ -42,97 +71,97 @@
     <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="px-4 py-6 sm:px-0">
             <!-- Flash Messages -->
-            <div th:if="${successMessage}" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <div th:if="${successMessage}" class="mb-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded relative transition-colors" role="alert">
                 <span class="block sm:inline" th:text="${successMessage}"></span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()">
-                    <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <svg class="fill-current h-6 w-6 text-green-500 dark:text-green-400" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
                     </svg>
                 </span>
             </div>
-            
-            <div th:if="${errorMessage}" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+
+            <div th:if="${errorMessage}" class="mb-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded relative transition-colors" role="alert">
                 <span class="block sm:inline" th:text="${errorMessage}"></span>
                 <span class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.remove()">
-                    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <svg class="fill-current h-6 w-6 text-red-500 dark:text-red-400" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                         <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
                     </svg>
                 </span>
             </div>
 
             <div>
-        <div class="bg-white shadow rounded-lg max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg max-w-2xl mx-auto transition-colors duration-200">
             <div class="px-4 py-5 sm:p-6">
                 <!-- Header -->
                 <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900" th:text="${isEdit ? 'Edit Todo' : 'Create New Todo'}"></h1>
-                    <p class="mt-2 text-sm text-gray-600" th:text="${isEdit ? 'Update your todo details' : 'Add a new todo to your list'}"></p>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white" th:text="${isEdit ? 'Edit Todo' : 'Create New Todo'}"></h1>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" th:text="${isEdit ? 'Update your todo details' : 'Add a new todo to your list'}"></p>
                 </div>
 
                 <!-- Form -->
-                <form th:action="${isEdit ? '/todos/' + todo.id : '/todos'}" 
+                <form th:action="${isEdit ? '/todos/' + todo.id : '/todos'}"
                       method="post"
                       class="space-y-6">
-                    
+
                     <div>
-                        <label for="todo" class="block text-sm font-medium text-gray-700 mb-2">
-                            Title <span class="text-red-500">*</span>
+                        <label for="todo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Title <span class="text-red-500 dark:text-red-400">*</span>
                         </label>
-                        <input type="text" 
-                               id="todo" 
-                               name="todo" 
+                        <input type="text"
+                               id="todo"
+                               name="todo"
                                th:value="${todo?.todo}"
                                required
                                placeholder="Enter todo title..."
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                        <p class="mt-1 text-sm text-gray-500">A brief title for your todo</p>
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">A brief title for your todo</p>
                     </div>
 
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Description
                         </label>
-                        <textarea id="description" 
-                                  name="description" 
+                        <textarea id="description"
+                                  name="description"
                                   rows="4"
                                   th:text="${todo?.description}"
                                   placeholder="Enter todo description (optional)..."
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"></textarea>
-                        <p class="mt-1 text-sm text-gray-500">Additional details about your todo</p>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary"></textarea>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Additional details about your todo</p>
                     </div>
 
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-                            Status <span class="text-red-500">*</span>
+                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Status <span class="text-red-500 dark:text-red-400">*</span>
                         </label>
-                        <select id="status" 
-                                name="status" 
+                        <select id="status"
+                                name="status"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                            <option th:each="s : ${statuses}" 
-                                    th:value="${s}" 
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s}"
                                     th:text="${s}"
                                     th:selected="${todo?.status == s}"></option>
                         </select>
-                        <p class="mt-1 text-sm text-gray-500">Current status of the todo</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Current status of the todo</p>
                     </div>
 
                     <!-- Status Badge Preview -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-sm font-medium text-gray-700 mb-2">Status Preview:</p>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg transition-colors">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status Preview:</p>
                         <div id="statusPreview" class="inline-block px-3 py-1 rounded-full text-sm font-semibold">
                             <span id="statusText">Select a status</span>
                         </div>
                     </div>
 
                     <!-- Form Actions -->
-                    <div class="flex items-center justify-end space-x-4 pt-4 border-t">
-                        <a href="/todos" 
-                           class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <div class="flex items-center justify-end space-x-4 pt-4 border-t dark:border-gray-700">
+                        <a href="/todos"
+                           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
                             Cancel
                         </a>
-                        <button type="submit" 
-                                class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary dark:bg-blue-600 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
                             <span th:text="${isEdit ? 'Update Todo' : 'Create Todo'}"></span>
                         </button>
                     </div>
@@ -141,9 +170,9 @@
         </div>
     </main>
 
-    <footer class="bg-white border-t mt-auto">
+    <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-auto transition-colors duration-200">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-gray-500 text-sm">
+            <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
                 © 2024 Todo Management System - Built with Spring Boot & Thymeleaf
             </p>
         </div>
@@ -156,10 +185,10 @@
             const statusText = document.getElementById('statusText');
 
             const statusStyles = {
-                'PENDING': { bg: 'bg-yellow-100', text: 'text-yellow-800', emoji: '⏳' },
-                'IN_PROGRESS': { bg: 'bg-blue-100', text: 'text-blue-800', emoji: '🔄' },
-                'COMPLETED': { bg: 'bg-green-100', text: 'text-green-800', emoji: '✅' },
-                'CANCELLED': { bg: 'bg-red-100', text: 'text-red-800', emoji: '❌' }
+                'PENDING': { bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-800 dark:text-yellow-200', emoji: '⏳' },
+                'IN_PROGRESS': { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-800 dark:text-blue-200', emoji: '🔄' },
+                'COMPLETED': { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', emoji: '✅' },
+                'CANCELLED': { bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-800 dark:text-red-200', emoji: '❌' }
             };
 
             function updateStatusPreview() {
@@ -169,13 +198,13 @@
                     statusPreview.className = `inline-block px-3 py-1 rounded-full text-sm font-semibold ${style.bg} ${style.text}`;
                     statusText.textContent = `${style.emoji} ${selectedStatus}`;
                 } else {
-                    statusPreview.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-600';
+                    statusPreview.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
                     statusText.textContent = 'Select a status';
                 }
             }
 
             statusSelect.addEventListener('change', updateStatusPreview);
-            
+
             // Initialize preview on page load
             if (statusSelect.value) {
                 updateStatusPreview();
@@ -184,4 +213,3 @@
     </div>
 </body>
 </html>
-

@@ -894,7 +894,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 **Hieu**
 
-- Email: hieu@example.com
+- Email: hieuprogrammer@gmail.com
 
 ## 🙏 Acknowledgments
 
@@ -910,4 +910,3 @@ For support, please open an issue in the GitHub repository or contact the mainta
 ---
 
 **Happy Coding! 🚀**
-

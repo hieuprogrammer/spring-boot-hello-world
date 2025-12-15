@@ -140,7 +140,7 @@
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
                             <option th:each="s : ${statuses}"
                                     th:value="${s}"
-                                    th:text="${s}"
+                                    th:text="${s.displayName}"
                                     th:selected="${todo?.status == s}"></option>
                         </select>
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Current status of the todo</p>
@@ -187,10 +187,10 @@
             const statusText = document.getElementById('statusText');
 
             const statusStyles = {
-                'PENDING': { bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-800 dark:text-yellow-200', emoji: '⏳' },
-                'IN_PROGRESS': { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-800 dark:text-blue-200', emoji: '🔄' },
-                'COMPLETED': { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', emoji: '✅' },
-                'CANCELLED': { bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-800 dark:text-red-200', emoji: '❌' }
+                'PENDING': { bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-800 dark:text-yellow-200', emoji: '⏳', label: 'Pending' },
+                'IN_PROGRESS': { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-800 dark:text-blue-200', emoji: '🔄', label: 'In Progress' },
+                'COMPLETED': { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', emoji: '✅', label: 'Completed' },
+                'CANCELLED': { bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-800 dark:text-red-200', emoji: '❌', label: 'Cancelled' }
             };
 
             function updateStatusPreview() {
@@ -198,7 +198,7 @@
                 if (selectedStatus && statusStyles[selectedStatus]) {
                     const style = statusStyles[selectedStatus];
                     statusPreview.className = `inline-block px-3 py-1 rounded-full text-sm font-semibold ${style.bg} ${style.text}`;
-                    statusText.textContent = `${style.emoji} ${selectedStatus}`;
+                    statusText.textContent = `${style.emoji} ${style.label}`;
                 } else {
                     statusPreview.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
                     statusText.textContent = 'Select a status';

@@ -159,6 +159,22 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
+                <!-- Global configuration so both report and check ignore selected packages.
+                     JaCoCo uses ANT-style path patterns for class files here. -->
+                <configuration>
+                    <excludes>
+                        <!-- Exclude domain entities (data classes with Lombok) -->
+                        <exclude>**/springboothelloworld/**/domain/**</exclude>
+                        <!-- Exclude exception classes (simple exception classes) -->
+                        <exclude>**/springboothelloworld/**/exception/**</exclude>
+                        <!-- Exclude configuration classes -->
+                        <exclude>**/springboothelloworld/**/configuration/**</exclude>
+                        <!-- Exclude DTOs (simple data carriers) -->
+                        <exclude>**/springboothelloworld/**/dto/**</exclude>
+                        <!-- Exclude main Spring Boot application class -->
+                        <exclude>**/springboothelloworld/**/*Application*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>jacoco-prepare-agent</id>
@@ -180,14 +196,6 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <excludes>
-                                <!-- Exclude domain entities (data classes with Lombok) -->
-                                <exclude>**/domain/**</exclude>
-                                <!-- Exclude exception classes (simple exception classes) -->
-                                <exclude>**/exception/**</exclude>
-                                <!-- Exclude configuration classes -->
-                                <exclude>**/configuration/**</exclude>
-                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>

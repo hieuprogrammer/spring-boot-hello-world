@@ -22,7 +22,7 @@ public class ReadmeLogger implements CommandLineRunner {
             // Try to find README.md in the project root
             // First, try relative to current working directory
             Path readmePath = Paths.get("README.md");
-            
+
             // If not found, try common locations
             if (!Files.exists(readmePath)) {
                 // Try parent directory (if running from target/classes)
@@ -33,19 +33,19 @@ public class ReadmeLogger implements CommandLineRunner {
                 String userDir = System.getProperty("user.dir");
                 readmePath = Paths.get(userDir, "README.md");
             }
-            
+
             if (Files.exists(readmePath)) {
                 log.info("=".repeat(80));
                 log.info("README.md Content:");
                 log.info("=".repeat(80));
-                
+
                 try (BufferedReader reader = Files.newBufferedReader(readmePath, StandardCharsets.UTF_8)) {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         log.info(line);
                     }
                 }
-                
+
                 log.info("=".repeat(80));
             } else {
                 log.warn("README.md file not found. Searched in: {}", readmePath.toAbsolutePath());
@@ -55,4 +55,3 @@ public class ReadmeLogger implements CommandLineRunner {
         }
     }
 }
-

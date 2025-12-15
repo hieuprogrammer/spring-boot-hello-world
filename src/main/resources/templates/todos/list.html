@@ -40,37 +40,7 @@
             }
         }
 
-        // Page size management functions
-        function decreasePageSize() {
-            const sizeInput = document.getElementById('size');
-            const currentSize = parseInt(sizeInput.value) || 10;
-            const newSize = Math.max(1, currentSize - 1);
-            sizeInput.value = newSize;
-            updatePageSize(newSize);
-        }
-
-        function increasePageSize() {
-            const sizeInput = document.getElementById('size');
-            const currentSize = parseInt(sizeInput.value) || 10;
-            const newSize = Math.min(100, currentSize + 1);
-            sizeInput.value = newSize;
-            updatePageSize(newSize);
-        }
-
-        function updatePageSize(newSize) {
-            if (newSize < 1 || newSize > 100) {
-                alert('Page size must be between 1 and 100');
-                return;
-            }
-            // Reset to page 0 when changing page size
-            document.getElementById('pageInput').value = 0;
-            // Submit the form to apply the new page size
-            const form = document.querySelector('form[method="get"]');
-            if (form) {
-                form.submit();
-            }
-        }
-
+        // Page size management with dropdown only
         function changePageSize(delta, customValue) {
             const select = document.getElementById('pageSizeSelect');
             const input = document.getElementById('pageSizeInput');
@@ -185,7 +155,7 @@
                                 <option value="">All Statuses</option>
                                 <option th:each="s : ${statuses}"
                                         th:value="${s}"
-                                        th:text="${s}"
+                                        th:text="${s.displayName}"
                                         th:selected="${statusFilter == s}"></option>
                             </select>
                         </div>
@@ -206,27 +176,18 @@
 
                         <div class="w-full md:w-40">
                             <label for="size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Items Per Page</label>
-                            <div class="flex items-center space-x-2">
-                                <button type="button" onclick="decreasePageSize()"
-                                        class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                                        aria-label="Decrease page size">
-                                    −
-                                </button>
-                                <input type="number"
-                                       id="size"
-                                       name="size"
-                                       th:value="${pageSize}"
-                                       min="1"
-                                       max="100"
-                                       step="1"
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center focus:outline-none focus:ring-primary focus:border-primary"
-                                       onchange="updatePageSize(this.value)">
-                                <button type="button" onclick="increasePageSize()"
-                                        class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                                        aria-label="Increase page size">
-                                    +
-                                </button>
-                            </div>
+                            <select id="size"
+                                    name="size"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary">
+                                <option value="5" th:selected="${pageSize == 5}">5</option>
+                                <option value="10" th:selected="${pageSize == 10}">10</option>
+                                <option value="15" th:selected="${pageSize == 15}">15</option>
+                                <option value="20" th:selected="${pageSize == 20}">20</option>
+                                <option value="25" th:selected="${pageSize == 25}">25</option>
+                                <option value="50" th:selected="${pageSize == 50}">50</option>
+                                <option value="75" th:selected="${pageSize == 75}">75</option>
+                                <option value="100" th:selected="${pageSize == 100}">100</option>
+                            </select>
                         </div>
 
                         <input type="hidden" name="page" id="pageInput" th:value="${currentPage}">
@@ -271,11 +232,16 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span th:if="${todo.status != null}" th:switch="${todo.status.name()}"
                                           class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                        <span th:case="'PENDING'" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">⏳ PENDING</span>
-                                        <span th:case="'IN_PROGRESS'" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">🔄 IN_PROGRESS</span>
-                                        <span th:case="'COMPLETED'" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">✅ COMPLETED</span>
-                                        <span th:case="'CANCELLED'" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">❌ CANCELLED</span>
-                                        <span th:case="*" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200" th:text="${todo.status}">Unknown</span>
+                                        <span th:case="'PENDING'" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                                              th:text="${'⏳ ' + todo.status.displayName}">⏳ Pending</span>
+                                        <span th:case="'IN_PROGRESS'" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                                              th:text="${'🔄 ' + todo.status.displayName}">🔄 In Progress</span>
+                                        <span th:case="'COMPLETED'" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                                              th:text="${'✅ ' + todo.status.displayName}">✅ Completed</span>
+                                        <span th:case="'CANCELLED'" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                                              th:text="${'❌ ' + todo.status.displayName}">❌ Cancelled</span>
+                                        <span th:case="*" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                                              th:text="${todo.status.displayName ?: todo.status}">Unknown</span>
                                     </span>
                                     <span th:if="${todo.status == null}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">No Status</span>
                                 </td>
@@ -304,37 +270,18 @@
                     </div>
                     <div class="flex items-center space-x-2">
                         <label for="pageSizeSelect" class="text-sm font-medium text-gray-700 dark:text-gray-300">Items per page:</label>
-                        <div class="flex items-center space-x-2">
-                            <button type="button" onclick="changePageSize(-1)"
-                                    class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                                    aria-label="Decrease page size">
-                                −
-                            </button>
-                            <select id="pageSizeSelect"
-                                    onchange="changePageSize(0, this.value)"
-                                    class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary text-sm">
-                                <option value="5" th:selected="${pageSize == 5}">5</option>
-                                <option value="10" th:selected="${pageSize == 10}">10</option>
-                                <option value="20" th:selected="${pageSize == 20}">20</option>
-                                <option value="50" th:selected="${pageSize == 50}">50</option>
-                                <option value="100" th:selected="${pageSize == 100}">100</option>
-                            </select>
-                            <input type="number"
-                                   id="pageSizeInput"
-                                   th:value="${pageSize}"
-                                   min="1"
-                                   max="100"
-                                   step="1"
-                                   placeholder="Custom"
-                                   class="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center text-sm focus:outline-none focus:ring-primary focus:border-primary"
-                                   onchange="changePageSize(0, this.value)"
-                                   onkeypress="if(event.key === 'Enter') changePageSize(0, this.value)">
-                            <button type="button" onclick="changePageSize(1)"
-                                    class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-                                    aria-label="Increase page size">
-                                +
-                            </button>
-                        </div>
+                        <select id="pageSizeSelect"
+                                onchange="changePageSize(0, this.value)"
+                                class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-primary focus:border-primary text-sm">
+                            <option value="5" th:selected="${pageSize == 5}">5</option>
+                            <option value="10" th:selected="${pageSize == 10}">10</option>
+                            <option value="15" th:selected="${pageSize == 15}">15</option>
+                            <option value="20" th:selected="${pageSize == 20}">20</option>
+                            <option value="25" th:selected="${pageSize == 25}">25</option>
+                            <option value="50" th:selected="${pageSize == 50}">50</option>
+                            <option value="75" th:selected="${pageSize == 75}">75</option>
+                            <option value="100" th:selected="${pageSize == 100}">100</option>
+                        </select>
                     </div>
                 </div>
 

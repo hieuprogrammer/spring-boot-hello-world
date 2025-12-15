@@ -14,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -49,6 +51,7 @@ public class TodoController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("statusFilter", status);
         model.addAttribute("statuses", Status.values());
+        model.addAttribute("pageNumbers", calculatePageNumbers(page, pageResponse.getTotalPages()));
         
         return "todos/list";
     }
@@ -160,6 +163,50 @@ public class TodoController {
                property.equals("description") || 
                property.equals("status") ||
                property.equals("id");
+    }
+    
+    /**
+     * Calculate page numbers to display in pagination.
+     * Shows current page and 2 pages on each side, plus first and last pages if needed.
+     */
+    private List<Integer> calculatePageNumbers(int currentPage, int totalPages) {
+        List<Integer> pageNumbers = new ArrayList<>();
+        
+        if (totalPages <= 7) {
+            // If 7 or fewer pages, show all
+            for (int i = 0; i < totalPages; i++) {
+                pageNumbers.add(i);
+            }
+        } else {
+            // Calculate the range of pages to show around current page
+            int startPage = Math.max(0, currentPage - 2);
+            int endPage = Math.min(totalPages - 1, currentPage + 2);
+            
+            // Always show first page if not in range
+            if (startPage > 0) {
+                pageNumbers.add(0);
+                // Add ellipsis marker (-1) if there's a gap
+                if (startPage > 1) {
+                    pageNumbers.add(-1);
+                }
+            }
+            
+            // Add pages around current page
+            for (int i = startPage; i <= endPage; i++) {
+                pageNumbers.add(i);
+            }
+            
+            // Always show last page if not in range
+            if (endPage < totalPages - 1) {
+                // Add ellipsis marker (-1) if there's a gap
+                if (endPage < totalPages - 2) {
+                    pageNumbers.add(-1);
+                }
+                pageNumbers.add(totalPages - 1);
+            }
+        }
+        
+        return pageNumbers;
     }
 }
 

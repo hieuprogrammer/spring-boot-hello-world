@@ -1,0 +1,9 @@
+todo,description,status
+Complete Spring Boot project #1,Finish implementing all features for the Spring Boot hello world application,IN_PROGRESS
+Review code changes #2,Go through the pull request and provide feedback,PENDING
+Write unit tests #3,Add comprehensive unit tests for all service methods,PENDING
+Update documentation #4,Update README with new features and setup instructions,PENDING
+Deploy to production #5,Deploy the application to production environment,PENDING
+Fix bug in authentication #6,Resolve the authentication issue reported by QA team,IN_PROGRESS
+Attend team meeting #7,Join the weekly team standup meeting,COMPLETED
+Refactor database queries #8,Optimize slow database queries for better performance,CANCELLED

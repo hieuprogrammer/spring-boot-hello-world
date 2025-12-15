@@ -28,7 +28,10 @@ public class OpenApiConfig {
         info.setContact(contact);
         info.setLicense(license);
         
-        return new OpenAPI().info(info);
+        OpenAPI openAPI = new OpenAPI();
+        openAPI.setInfo(info);
+        
+        return openAPI;
     }
 }
 

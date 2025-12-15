@@ -78,6 +78,7 @@ class TodoControllerTest {
         verify(model, times(1)).addAttribute("keyword", null);
         verify(model, times(1)).addAttribute("statusFilter", null);
         verify(model, times(1)).addAttribute("statuses", Status.values());
+        verify(model, times(1)).addAttribute(eq("pageNumbers"), anyList());
     }
 
     @Test

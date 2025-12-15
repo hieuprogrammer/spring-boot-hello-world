@@ -178,13 +178,15 @@
                                     <div class="text-sm text-gray-500 dark:text-gray-400" th:text="${todo.description ?: 'No description'}"></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span th:switch="${todo.status}"
+                                    <span th:if="${todo.status != null}" th:switch="${todo.status.name()}"
                                           class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                                        <span th:case="PENDING" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">⏳ PENDING</span>
-                                        <span th:case="IN_PROGRESS" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">🔄 IN_PROGRESS</span>
-                                        <span th:case="COMPLETED" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">✅ COMPLETED</span>
-                                        <span th:case="CANCELLED" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">❌ CANCELLED</span>
+                                        <span th:case="'PENDING'" class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">⏳ PENDING</span>
+                                        <span th:case="'IN_PROGRESS'" class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">🔄 IN_PROGRESS</span>
+                                        <span th:case="'COMPLETED'" class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">✅ COMPLETED</span>
+                                        <span th:case="'CANCELLED'" class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">❌ CANCELLED</span>
+                                        <span th:case="*" class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200" th:text="${todo.status}">Unknown</span>
                                     </span>
+                                    <span th:if="${todo.status == null}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">No Status</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a th:href="@{/todos/{id}/edit(id=${todo.id})}"
@@ -203,26 +205,38 @@
                 </div>
 
                 <!-- Pagination -->
-                <div th:if="${pageResponse.totalPages > 1}" class="mt-6 flex items-center justify-between">
+                <div th:if="${pageResponse.totalPages > 1}" class="mt-6 flex items-center justify-between flex-wrap gap-4">
                     <div class="text-sm text-gray-700 dark:text-gray-300">
                         Showing <span th:text="${pageResponse.page * pageResponse.size + 1}"></span> to
                         <span th:text="${pageResponse.page * pageResponse.size + pageResponse.content.size()}"></span> of
                         <span th:text="${pageResponse.totalElements}"></span> results
                     </div>
-                    <div class="flex space-x-2">
+                    <div class="flex items-center space-x-1">
+                        <!-- Previous Button -->
                         <a th:if="${!pageResponse.first}"
                            th:href="@{/todos(page=${currentPage - 1}, size=${pageSize}, sort=${sort}, keyword=${keyword}, status=${statusFilter})}"
                            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
                             ← Previous
                         </a>
-                        <span th:each="pageNum : ${#numbers.sequence(0, pageResponse.totalPages - 1)}"
-                              class="px-3 py-2 border rounded-md text-sm font-medium transition-colors"
-                              th:class="${pageNum == currentPage ? 'bg-primary dark:bg-blue-600 text-white border-primary dark:border-blue-600' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'}">
-                            <a th:if="${pageNum != currentPage}"
-                               th:href="@{/todos(page=${pageNum}, size=${pageSize}, sort=${sort}, keyword=${keyword}, status=${statusFilter})}"
-                               th:text="${pageNum + 1}"></a>
-                            <span th:if="${pageNum == currentPage}" th:text="${pageNum + 1}"></span>
-                        </span>
+                        
+                        <!-- Page Numbers -->
+                        <template th:each="pageNum : ${pageNumbers}">
+                            <!-- Ellipsis -->
+                            <span th:if="${pageNum == -1}" class="px-2 text-gray-500 dark:text-gray-400">...</span>
+                            
+                            <!-- Page Number -->
+                            <span th:unless="${pageNum == -1}"
+                                  class="px-3 py-2 border rounded-md text-sm font-medium transition-colors"
+                                  th:class="${pageNum == currentPage ? 'bg-primary dark:bg-blue-600 text-white border-primary dark:border-blue-600 cursor-default' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'}">
+                                <a th:if="${pageNum != currentPage}"
+                                   th:href="@{/todos(page=${pageNum}, size=${pageSize}, sort=${sort}, keyword=${keyword}, status=${statusFilter})}"
+                                   th:text="${pageNum + 1}"
+                                   class="block"></a>
+                                <span th:if="${pageNum == currentPage}" th:text="${pageNum + 1}"></span>
+                            </span>
+                        </template>
+                        
+                        <!-- Next Button -->
                         <a th:if="${!pageResponse.last}"
                            th:href="@{/todos(page=${currentPage + 1}, size=${pageSize}, sort=${sort}, keyword=${keyword}, status=${statusFilter})}"
                            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">

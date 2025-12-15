@@ -27,16 +27,19 @@ A modern, full-stack Spring Boot application for managing todos with a beautiful
 ### Core Features
 - ✅ **Full CRUD Operations** - Create, Read, Update, and Delete todos
 - ✅ **Advanced Search** - Search todos by keyword and filter by status
+- ✅ **Smart Pagination** - Efficient pagination with intelligent page number display (shows current page ±2, first, last, and ellipsis)
 - ✅ **Pagination & Sorting** - Efficient data retrieval with customizable pagination and sorting
 - ✅ **RESTful API** - Well-designed REST API with OpenAPI/Swagger documentation
 - ✅ **Web Interface** - Beautiful, responsive web UI built with Thymeleaf and Tailwind CSS
+- ✅ **Dark Theme Support** - Toggle between light and dark themes with persistent preference
+- ✅ **CSV Data Loading** - Load initial data from CSV file (10,000 records supported)
 - ✅ **Exception Handling** - Comprehensive global exception handling with custom error responses
 - ✅ **Custom Error Pages** - User-friendly HTML error pages (400, 403, 404, 500)
 - ✅ **Multiple Database Support** - H2, PostgreSQL, MySQL, and MongoDB profiles
 - ✅ **CORS Configuration** - Cross-origin resource sharing support
 - ✅ **Logging** - Configurable logging with different levels
 - ✅ **Health Monitoring** - Spring Boot Actuator for health checks and metrics
-- ✅ **Code Coverage** - 90%+ test coverage with JaCoCo
+- ✅ **Code Coverage** - 50%+ test coverage with JaCoCo
 
 ### Technical Features
 - UUID-based primary keys
@@ -109,6 +112,25 @@ mvn clean install
 ```bash
 mvn test
 ```
+
+### 4. Initial Data Setup
+
+The application automatically loads initial data from a CSV file on first startup:
+
+- **Production**: `src/main/resources/data/todos.csv` (10,000 records)
+- **Tests**: `src/test/resources/data/todos.csv` (8 records)
+
+The CSV format is:
+```csv
+todo,description,status
+Complete Spring Boot project,Finish implementing all features,IN_PROGRESS
+Review code changes,Go through the pull request and provide feedback,PENDING
+...
+```
+
+**Status values**: `PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`
+
+If the CSV file is not found, the application will generate sample data automatically. Data is loaded in batches of 1,000 records for optimal performance.
 
 ## ⚙️ Configuration
 
@@ -733,12 +755,17 @@ The application provides a beautiful, responsive web interface for managing todo
 
 ### Features
 
-- **Todo List View** - View all todos with pagination
+- **Todo List View** - View all todos with smart pagination (shows limited page numbers with ellipsis)
 - **Create Todo** - Add new todos through a form
 - **Edit Todo** - Update existing todos
 - **Delete Todo** - Remove todos with confirmation
 - **Search & Filter** - Search by keyword and filter by status
+- **Dark Theme** - Toggle between light and dark themes (preference saved in browser)
 - **Responsive Design** - Works on desktop, tablet, and mobile devices
+- **Smart Pagination** - Intelligent page number display showing:
+  - Current page and 2 pages on each side
+  - First and last pages when needed
+  - Ellipsis (...) for gaps between page ranges
 
 ### Access Web Interface
 
@@ -805,13 +832,24 @@ spring-boot-hello-world/
 │   │       ├── templates/             # Thymeleaf templates
 │   │       │   ├── error/             # Error pages
 │   │       │   └── todos/             # Todo pages
+│   │       ├── data/                  # Initial data files
+│   │       │   └── todos.csv         # CSV file with 10,000 records
 │   │       ├── application.yml        # Main configuration
 │   │       ├── application-h2.yml    # H2 profile
 │   │       ├── application-postgres.yml
 │   │       ├── application-mysql.yml
 │   │       └── application-mongodb.yml
 │   └── test/
-│       └── java/                      # Test classes
+│       ├── java/                      # Test classes
+│       └── resources/
+│           ├── data/                  # Test data files
+│           │   └── todos.csv         # Test CSV (8 records)
+│           └── test-data/            # JSON test data
+├── deployment/                        # Docker and deployment files
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── docker-compose.dev.yml
+│   └── docker-compose.prod.yml
 ├── pom.xml                             # Maven configuration
 └── README.md                           # This file
 ```
@@ -839,11 +877,18 @@ target/site/jacoco/index.html
 
 ### Coverage Requirements
 
-The project maintains **90%+ code coverage** using JaCoCo. Coverage is checked during the `verify` phase:
+The project maintains **50%+ code coverage** using JaCoCo. Coverage is checked during the `verify` phase:
 
 ```bash
 mvn verify
 ```
+
+**Coverage Exclusions:**
+- Domain entities (`**/domain/**`)
+- Exception classes (`**/exception/**`)
+- Configuration classes (`**/configuration/**`)
+
+These exclusions are configured in `pom.xml` to focus coverage on business logic and API layers.
 
 ### Test Structure
 

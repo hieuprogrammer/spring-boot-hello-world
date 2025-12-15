@@ -18,11 +18,12 @@ Please add the following screenshots to this directory:
 
 ## How to Take Screenshots
 
-1. Start the application: `mvn spring-boot:run`
-2. Navigate to http://localhost:8080
-3. Take screenshots of each page/feature
-4. Save them in this directory with the names listed above
-5. Update the README.md file paths if you use different names
+1. Start the application locally: `mvn spring-boot:run` **or** open the deployed app at  
+   `https://spring-boot-hello-world-603w.onrender.com/todos`.
+2. Navigate through the main flows (home, todo list, create/edit forms, search, error pages, Swagger UI).
+3. Take screenshots of each page/feature.
+4. Save them in this directory with the names listed above.
+5. Update the `README.md` file paths if you use different names.
 
 ## Screenshot Guidelines
 

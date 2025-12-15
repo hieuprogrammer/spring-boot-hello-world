@@ -314,12 +314,23 @@ docker rm spring-boot-todo-app
 
 Once started, the application will be available at:
 
-- **Web Interface**: http://localhost:8080
-- **REST API**: http://localhost:8080/api/todos
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **API Docs**: http://localhost:8080/api-docs
-- **Health Check**: http://localhost:8080/actuator/health
-- **Metrics**: http://localhost:8080/actuator/metrics
+- **Local Web Interface**: `http://localhost:8080`
+- **Local REST API**: `http://localhost:8080/api/todos`
+- **Local Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **Local API Docs**: `http://localhost:8080/api-docs`
+- **Local Health Check**: `http://localhost:8080/actuator/health`
+- **Local Metrics**: `http://localhost:8080/actuator/metrics`
+
+### 🌍 Live Demo (Render)
+
+The application is also deployed to Render and accessible publicly here:
+
+- **Production Web Interface**: [`https://spring-boot-hello-world-603w.onrender.com/todos`](https://spring-boot-hello-orld-603w.onrender.com/todos)
+- **Production REST API**: `https://spring-boot-hello-world-603w.onrender.com/api/todos`
+- **Production Swagger UI**: `https://spring-boot-hello-world-603w.onrender.com/swagger-ui.html`
+- **Production API Docs**: `https://spring-boot-hello-world-603w.onrender.com/api-docs`
+- **Production Health Check**: `https://spring-boot-hello-world-603w.onrender.com/actuator/health`
+- **Production Metrics**: `https://spring-boot-hello-world-603w.onrender.com/actuator/metrics`
 
 ## 📚 API Documentation
 
@@ -353,11 +364,21 @@ http://localhost:8080/swagger-ui.html
 
 All API endpoints can be tested using cURL commands. Replace `{id}` with an actual UUID when needed.
 
+For convenience, you can define a `BASE_URL` that points either to your **local** instance or the **production** Render deployment:
+
+```bash
+# Local
+export BASE_URL="http://localhost:8080"
+
+# Production (Render)
+# export BASE_URL="https://spring-boot-hello-world-603w.onrender.com"
+```
+
 #### 1. Ping Endpoint
 
 **Health Check**
 ```bash
-curl -X GET "http://localhost:8080/ping"
+curl -X GET "$BASE_URL/ping"
 ```
 
 **Expected Response:**
@@ -371,37 +392,37 @@ pong
 
 **Basic Request (Default Pagination)**
 ```bash
-curl -X GET "http://localhost:8080/api/todos"
+curl -X GET "$BASE_URL/api/todos"
 ```
 
 **With Pagination**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10"
+curl -X GET "$BASE_URL/api/todos?page=0&size=10"
 ```
 
 **With Sorting (Ascending)**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=todo,asc"
+curl -X GET "$BASE_URL/api/todos?page=0&size=10&sort=todo,asc"
 ```
 
 **With Sorting (Descending)**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=todo,desc"
+curl -X GET "$BASE_URL/api/todos?page=0&size=10&sort=todo,desc"
 ```
 
 **Sort by Status**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=status,asc"
+curl -X GET "$BASE_URL/api/todos?page=0&size=10&sort=status,asc"
 ```
 
 **Sort by ID (Newest First)**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10&sort=id,desc"
+curl -X GET "$BASE_URL/api/todos?page=0&size=10&sort=id,desc"
 ```
 
 **Pretty Print JSON Response**
 ```bash
-curl -X GET "http://localhost:8080/api/todos?page=0&size=10" | json_pp
+curl -X GET "$BASE_URL/api/todos?page=0&size=10" | json_pp
 ```
 
 ---
@@ -410,27 +431,27 @@ curl -X GET "http://localhost:8080/api/todos?page=0&size=10" | json_pp
 
 **Search by Keyword Only**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/search?keyword=spring"
+curl -X GET "$BASE_URL/api/todos/search?keyword=spring"
 ```
 
 **Search by Status Only**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/search?status=PENDING"
+curl -X GET "$BASE_URL/api/todos/search?status=PENDING"
 ```
 
 **Search by Keyword and Status**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING"
+curl -X GET "$BASE_URL/api/todos/search?keyword=spring&status=PENDING"
 ```
 
 **Search with Pagination**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING&page=0&size=10"
+curl -X GET "$BASE_URL/api/todos/search?keyword=spring&status=PENDING&page=0&size=10"
 ```
 
 **Search with Sorting**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDING&page=0&size=10&sort=todo,asc"
+curl -X GET "$BASE_URL/api/todos/search?keyword=spring&status=PENDING&page=0&size=10&sort=todo,asc"
 ```
 
 **Available Status Values:**
@@ -445,14 +466,14 @@ curl -X GET "http://localhost:8080/api/todos/search?keyword=spring&status=PENDIN
 
 **Get Single Todo**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+curl -X GET "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000"
 ```
 
 **Replace `123e4567-e89b-12d3-a456-426614174000` with an actual UUID from your database.**
 
 **Example with Pretty Print:**
 ```bash
-curl -X GET "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" | json_pp
+curl -X GET "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" | json_pp
 ```
 
 ---
@@ -461,7 +482,7 @@ curl -X GET "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Create Todo with All Fields**
 ```bash
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Learn Spring Boot",
@@ -472,7 +493,7 @@ curl -X POST "http://localhost:8080/api/todos" \
 
 **Create Todo with Minimal Fields (Status defaults to PENDING)**
 ```bash
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Learn Spring Boot"
@@ -481,7 +502,7 @@ curl -X POST "http://localhost:8080/api/todos" \
 
 **Create Todo with Different Status**
 ```bash
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Deploy Application",
@@ -493,22 +514,22 @@ curl -X POST "http://localhost:8080/api/todos" \
 **Create Todo - All Status Options:**
 ```bash
 # PENDING
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{"todo": "Task 1", "status": "PENDING"}'
 
 # IN_PROGRESS
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{"todo": "Task 2", "status": "IN_PROGRESS"}'
 
 # COMPLETED
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{"todo": "Task 3", "status": "COMPLETED"}'
 
 # CANCELLED
-curl -X POST "http://localhost:8080/api/todos" \
+curl -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{"todo": "Task 4", "status": "CANCELLED"}'
 ```
@@ -519,7 +540,7 @@ curl -X POST "http://localhost:8080/api/todos" \
 
 **Update All Fields**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+curl -X PUT "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Learn Spring Boot - Updated",
@@ -530,7 +551,7 @@ curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Update Only Title**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+curl -X PUT "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Updated Todo Title"
@@ -539,7 +560,7 @@ curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Update Only Description**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+curl -X PUT "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" \
   -H "Content-Type: application/json" \
   -d '{
     "description": "Updated description only"
@@ -548,7 +569,7 @@ curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Update Only Status**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+curl -X PUT "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" \
   -H "Content-Type: application/json" \
   -d '{
     "status": "COMPLETED"
@@ -557,7 +578,7 @@ curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Mark Todo as Completed**
 ```bash
-curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000" \
+curl -X PUT "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000" \
   -H "Content-Type: application/json" \
   -d '{"status": "COMPLETED"}'
 ```
@@ -568,12 +589,12 @@ curl -X PUT "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-42661417400
 
 **Delete Todo by ID**
 ```bash
-curl -X DELETE "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+curl -X DELETE "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000"
 ```
 
 **Delete with Verbose Output**
 ```bash
-curl -v -X DELETE "http://localhost:8080/api/todos/123e4567-e89b-12d3-a456-426614174000"
+curl -v -X DELETE "$BASE_URL/api/todos/123e4567-e89b-12d3-a456-426614174000"
 ```
 
 ---
@@ -584,7 +605,7 @@ Here's a complete workflow example from creating to deleting a todo:
 
 ```bash
 # 1. Create a new todo
-RESPONSE=$(curl -s -X POST "http://localhost:8080/api/todos" \
+RESPONSE=$(curl -s -X POST "$BASE_URL/api/todos" \
   -H "Content-Type: application/json" \
   -d '{
     "todo": "Test Todo",
@@ -597,24 +618,24 @@ TODO_ID=$(echo $RESPONSE | jq -r '.id')
 echo "Created Todo ID: $TODO_ID"
 
 # 2. Get the created todo
-curl -X GET "http://localhost:8080/api/todos/$TODO_ID" | json_pp
+curl -X GET "$BASE_URL/api/todos/$TODO_ID" | json_pp
 
 # 3. Update the todo
-curl -X PUT "http://localhost:8080/api/todos/$TODO_ID" \
+curl -X PUT "$BASE_URL/api/todos/$TODO_ID" \
   -H "Content-Type: application/json" \
   -d '{
     "status": "IN_PROGRESS"
   }'
 
 # 4. Mark as completed
-curl -X PUT "http://localhost:8080/api/todos/$TODO_ID" \
+curl -X PUT "$BASE_URL/api/todos/$TODO_ID" \
   -H "Content-Type: application/json" \
   -d '{
     "status": "COMPLETED"
   }'
 
 # 5. Delete the todo
-curl -X DELETE "http://localhost:8080/api/todos/$TODO_ID"
+curl -X DELETE "$BASE_URL/api/todos/$TODO_ID"
 ```
 
 ---
@@ -682,33 +703,33 @@ curl -X DELETE "http://localhost:8080/api/todos/$TODO_ID"
 
 1. **Pretty Print JSON**: Pipe output to `json_pp` or `jq`:
    ```bash
-   curl -X GET "http://localhost:8080/api/todos" | json_pp
-   curl -X GET "http://localhost:8080/api/todos" | jq
+   curl -X GET "$BASE_URL/api/todos" | json_pp
+   curl -X GET "$BASE_URL/api/todos" | jq
    ```
 
 2. **Save Response to File**:
    ```bash
-   curl -X GET "http://localhost:8080/api/todos" -o response.json
+   curl -X GET "$BASE_URL/api/todos" -o response.json
    ```
 
 3. **Include Headers in Output**:
    ```bash
-   curl -i -X GET "http://localhost:8080/api/todos"
+   curl -i -X GET "$BASE_URL/api/todos"
    ```
 
 4. **Verbose Output (Debugging)**:
    ```bash
-   curl -v -X GET "http://localhost:8080/api/todos"
+   curl -v -X GET "$BASE_URL/api/todos"
    ```
 
 5. **Follow Redirects**:
    ```bash
-   curl -L -X GET "http://localhost:8080/api/todos"
+   curl -L -X GET "$BASE_URL/api/todos"
    ```
 
 6. **Set Timeout**:
    ```bash
-   curl --max-time 10 -X GET "http://localhost:8080/api/todos"
+   curl --max-time 10 -X GET "$BASE_URL/api/todos"
    ```
 
 ---
@@ -719,7 +740,7 @@ Spring Boot Actuator provides additional endpoints for monitoring and managing t
 
 #### Health Check
 ```bash
-curl -X GET "http://localhost:8080/actuator/health"
+curl -X GET "$BASE_URL/actuator/health"
 ```
 
 **Expected Response:**
@@ -731,22 +752,22 @@ curl -X GET "http://localhost:8080/actuator/health"
 
 #### Application Info
 ```bash
-curl -X GET "http://localhost:8080/actuator/info"
+curl -X GET "$BASE_URL/actuator/info"
 ```
 
 #### Metrics
 ```bash
-curl -X GET "http://localhost:8080/actuator/metrics"
+curl -X GET "$BASE_URL/actuator/metrics"
 ```
 
 **Get Specific Metric:**
 ```bash
-curl -X GET "http://localhost:8080/actuator/metrics/jvm.memory.used"
+curl -X GET "$BASE_URL/actuator/metrics/jvm.memory.used"
 ```
 
 #### All Available Endpoints
 ```bash
-curl -X GET "http://localhost:8080/actuator"
+curl -X GET "$BASE_URL/actuator"
 ```
 
 ## 🌐 Web Interface

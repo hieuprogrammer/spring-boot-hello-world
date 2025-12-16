@@ -1,24 +1,29 @@
 package dev.hieu.springboothelloworld.web.controller;
 
-import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
-import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
-import dev.hieu.springboothelloworld.domain.Status;
-import dev.hieu.springboothelloworld.dto.PageResponse;
-import dev.hieu.springboothelloworld.dto.TodoDTO;
-import dev.hieu.springboothelloworld.exception.ResourceNotFoundException;
-import dev.hieu.springboothelloworld.service.TodoService;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import dev.hieu.springboothelloworld.domain.Status;
+import dev.hieu.springboothelloworld.dto.PageResponse;
+import dev.hieu.springboothelloworld.dto.TodoDTO;
+import dev.hieu.springboothelloworld.exception.ResourceNotFoundException;
+import dev.hieu.springboothelloworld.service.TodoService;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlag;
+import dev.hieu.springboothelloworld.service.feature.FeatureFlagService;
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/todos")
@@ -84,7 +89,9 @@ public class TodoController {
             model.addAttribute("errorMessage", "Todo write operations are currently disabled.");
             return "redirect:/todos";
         }
-        model.addAttribute("todo", new TodoDTO());
+        TodoDTO todoDTO = new TodoDTO();
+        todoDTO.setStatus(Status.PENDING); // Set default status
+        model.addAttribute("todo", todoDTO);
         model.addAttribute("statuses", Status.values());
         model.addAttribute("isEdit", false);
         model.addAttribute("isTodoWriteEnabled", featureFlagService.isEnabled(FeatureFlag.TODO_WRITE_API));
